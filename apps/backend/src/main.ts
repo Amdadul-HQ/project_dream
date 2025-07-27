@@ -12,7 +12,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('api')
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
@@ -23,7 +23,11 @@ async function bootstrap() {
   });
 
   await app.listen(process.env.PORT ?? 3001);
-  console.log(`🚀 Server running on http://localhost:${process.env.PORT ?? 3001}`);
-  console.log(`📚 Swagger docs available at http://localhost:${process.env.PORT ?? 3001}/api`);
+  console.log(
+    `🚀 Server running on http://localhost:${process.env.PORT ?? 3001}`,
+  );
+  console.log(
+    `📚 Swagger docs available at http://localhost:${process.env.PORT ?? 3001}/api`,
+  );
 }
 bootstrap();
