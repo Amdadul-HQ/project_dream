@@ -92,6 +92,7 @@ pnpm backend:start
 
 ## Available Scripts
 
+### Development
 - `pnpm dev` - Start both apps in development mode
 - `pnpm build` - Build both applications
 - `pnpm start` - Start both apps in production mode
@@ -99,6 +100,13 @@ pnpm backend:start
 - `pnpm test` - Run tests for both applications
 - `pnpm frontend:dev` - Start only the frontend in development
 - `pnpm backend:dev` - Start only the backend in development
+
+### Docker
+- `pnpm docker:up` - Start all services with Docker (production)
+- `pnpm docker:dev` - Start development containers with hot reload
+- `pnpm docker:down` - Stop all Docker services
+- `pnpm docker:logs` - View logs from all services
+- `pnpm docker:clean` - Clean up containers and images
 
 ## Features
 
@@ -125,6 +133,28 @@ The backend includes Swagger/OpenAPI documentation with sample endpoints:
 - **DELETE** `/users/:id` - Delete user by ID
 
 Access the interactive API documentation at: `http://localhost:3001/api`
+
+## Docker Support
+
+The project includes full Docker support for both development and production environments.
+
+### Quick Start with Docker
+
+```bash
+# Production mode
+pnpm docker:up
+
+# Development mode with hot reload
+pnpm docker:dev
+```
+
+### Access Points (Docker)
+- **Frontend**: http://localhost:3000
+- **Backend**: http://localhost:3001
+- **Nginx Proxy**: http://localhost (routes to both services)
+- **Swagger Docs**: http://localhost/docs
+
+For detailed Docker setup and configuration, see [DOCKER.md](./DOCKER.md).
 
 ## Adding Shared Packages
 
