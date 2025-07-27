@@ -1,0 +1,23 @@
+{
+  "name": "fullstack-monorepo",
+  "version": "1.0.0",
+  "description": "A monorepo with Next.js frontend and Nest.js backend",
+  "main": "index.js",
+  "scripts": {
+    "dev": "pnpm --parallel --filter './apps/*' dev",
+    "build": "pnpm --parallel --filter './apps/*' build",
+    "start": "pnpm --parallel --filter './apps/*' start",
+    "lint": "pnpm --parallel --filter './apps/*' lint",
+    "test": "pnpm --parallel --filter './apps/*' test",
+    "frontend:dev": "pnpm --filter frontend dev",
+    "frontend:build": "pnpm --filter frontend build",
+    "frontend:start": "pnpm --filter frontend start",
+    "backend:dev": "pnpm --filter backend start:dev",
+    "backend:build": "pnpm --filter backend build",
+    "backend:start": "pnpm --filter backend start:prod"
+  },
+  "keywords": ["monorepo", "nextjs", "nestjs", "fullstack"],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.11.0"
+}
