@@ -10,28 +10,135 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Example User model
+// User Model 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  posts     Post[]
+  id       String      @id @default(uuid())
+  name     String
+  phone    String
+  email    String
+  address  String
+  profile  String
+  isVerified Boolean       @default(false)
+  role      Role           @default(USER)
+  socialMediaId   String
 
-  @@map("users")
+
+  socialMedia UserSocialMedia?
+  credentials Creadentials?
+  likedPost   Post[]
+  post Post[] @relation(name: "writer")
+  comments Comment[]
+  
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+
+
 }
 
-// Example Post model
+// user role enum
+enum Role {
+  USER
+  WRITER
+  ADMIN
+}
+
+// User Socal media 
+model UserSocialMedia {
+  id        String     @id @default(uuid())
+  userId    String @unique
+  faceBook  String
+  youtube   String      
+  twitter   String
+  instagram String
+  pinterest String
+
+
+  user      User        @relation(fields: [userId],references: [id])
+  
+  
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+// Example User credentials model
+model Creadentials {
+  id        String      @id @default(uuid())
+  userId    String @unique
+  email     String      @unique
+  password  String
+  role      Role
+  
+  
+  user      User   @relation(fields: [userId],references: [id])
+  
+  
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+// Post model
 model Post {
-  id        Int      @id @default(autoincrement())
+  id        String      @id @default(uuid())
+  seriesid  String?     @unique
+  categoryid String
+  userId    String?     @unique
+  
   title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  Int
-  author    User     @relation(fields: [authorId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  content   Json
 
-  @@map("posts")
+  series    Series?     @relation(fields: [seriesid], references: [id])
+  category  Category[]
+  writer    User?       @relation(name: "writer", fields: [userId], references: [id])
+  like      User[]
+  comments  Comment[]   // 👈 New relation added
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
+
+// comment model
+model Comment {
+  id        String    @id @default(uuid())
+  postId    String
+  userId    String
+  comment   String
+  parentId  String?   // For replies
+  post      Post      @relation(fields: [postId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+
+// Serise Model
+model Series {
+  id        String      @id @default(uuid())
+  name      String      @unique
+  postId    String      @unique
+  categoryid String?
+  category  Category[]
+  post      Post[]
+
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+
+// Category model
+model Category {
+  id      String      @id   @default(uuid())
+  name    String      @unique
+  series  Series[]
+  post    Post[]
+
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
