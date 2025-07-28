@@ -122,6 +122,13 @@ enum PostStatus {
   HOLD
 }
 
+// File Type enum
+enum FileType {
+  docs
+  image
+  link
+}
+
 // comment model
 model Comment {
   id        String    @id @default(uuid())
