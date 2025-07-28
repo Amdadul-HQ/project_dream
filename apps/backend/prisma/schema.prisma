@@ -14,27 +14,45 @@ datasource db {
 model User {
   id       String      @id @default(uuid())
   name     String
-  phone    String
+  phone    String?
   email    String
-  address  String
-  profile  String
+  password  String
+  address  String?
+  profile  String?
   isVerified Boolean       @default(false)
   role      Role           @default(USER)
   socialMediaId   String
+  isGoogle  Boolean     @default(false)
+  status    UserStatus  @default(Active)
 
 
   socialMedia UserSocialMedia?
-  credentials Creadentials?
   likedPost   Post[]
   post Post[] @relation(name: "writer")
-  comments Comment[]
+  commentsPost Comment[]
+
+   // 👇 Follower system
+  followers      Follow[] @relation("Followee")
+  following      Follow[] @relation("Follower")
   
 
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+}
 
+// follwer system model
+model Follow {
+  id         String   @id @default(uuid())
+  
+  followerId String
+  followeeId String
 
+  follower   User     @relation("Follower", fields: [followerId], references: [id])
+  followee   User     @relation("Followee", fields: [followeeId], references: [id])
 
+  createdAt  DateTime @default(now())
+
+  @@unique([followerId, followeeId]) // prevent duplicate follows
 }
 
 // user role enum
@@ -62,20 +80,13 @@ model UserSocialMedia {
   updatedAt DateTime    @updatedAt
 }
 
-// Example User credentials model
-model Creadentials {
-  id        String      @id @default(uuid())
-  userId    String @unique
-  email     String      @unique
-  password  String
-  role      Role
-  
-  
-  user      User   @relation(fields: [userId],references: [id])
-  
-  
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+
+// user status
+enum UserStatus {
+  Active
+  Blocked
+  Ban
+  Suspened
 }
 
 // Post model
@@ -87,15 +98,28 @@ model Post {
   
   title     String
   content   Json
+  likeCount Int         @default(0)
+  commentCount  Int     @default(0)
 
   series    Series?     @relation(fields: [seriesid], references: [id])
   category  Category[]
   writer    User?       @relation(name: "writer", fields: [userId], references: [id])
   like      User[]
-  comments  Comment[]   // 👈 New relation added
+  comments  Comment[]
+
+  status    PostStatus
 
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+}
+
+// Post Status
+enum PostStatus {
+  REPORTED
+  PUBLISHED
+  UNDER_REVIEW
+  DELETED
+  HOLD
 }
 
 // comment model
