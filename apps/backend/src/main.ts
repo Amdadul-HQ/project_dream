@@ -1,33 +1,47 @@
+import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import 'reflect-metadata';
 import { AppModule } from './app.module';
+import { ENVEnum } from './common/enum/env.enum';
+import { AllExceptionsFilter } from './common/filter/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
 
-  // Swagger configuration
-  const config = new DocumentBuilder()
-    .setTitle('Fullstack Monorepo API')
-    .setDescription('The API documentation for the Nest.js backend')
-    .setVersion('1.0')
-    .addTag('api')
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-
-  // Enable CORS for frontend
   app.enableCors({
-    origin: 'http://localhost:3000', // Frontend URL
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
 
-  await app.listen(process.env.PORT ?? 3001);
-  console.log(
-    `🚀 Server running on http://localhost:${process.env.PORT ?? 3001}`,
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      // forbidNonWhitelisted: true,
+      transform: true,
+    }),
   );
-  console.log(
-    `📚 Swagger docs available at http://localhost:${process.env.PORT ?? 3001}/api`,
-  );
+
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  app.setGlobalPrefix('js');
+
+  // ✅ Swagger config with Bearer Auth
+  const config = new DocumentBuilder()
+    .setTitle('Jesus VLSCO')
+    .setDescription('Jesus VLSCO API description')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('js/docs', app, document);
+
+  const port = parseInt(configService.get<string>(ENVEnum.PORT) ?? '5000', 10);
+  await app.listen(port);
 }
-bootstrap();
+
+void bootstrap();
