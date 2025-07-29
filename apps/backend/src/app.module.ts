@@ -13,6 +13,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { LibModule } from './lib/lib.module';
 import { NotificationModule } from './lib/notification/notification.module';
 import { MainModule } from './main/main.module';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -64,7 +65,7 @@ import { MainModule } from './main/main.module';
     LibModule,
   ],
   controllers: [AppController],
-  providers: [JwtStrategy],
+  providers: [JwtStrategy,AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
