@@ -25,11 +25,13 @@ export class CloudinaryService {
   async uploadImageFromBuffer(
     fileBuffer: Buffer,
     filename: string,
-    folder = 'profile-images',
+    folder = 'project-dream',
   ): Promise<UploadApiResponse> {
     return new Promise((resolve, reject) => {
-      const originalNameWithoutExt = path.parse(filename).name;
-
+      function stripExtension(filename: string): string {
+        return filename.replace(/\.[^/.]+$/, '');
+      }
+      const originalNameWithoutExt = stripExtension(filename);
       const stream = cloudinary.uploader.upload_stream(
         {
           folder,
@@ -37,6 +39,7 @@ export class CloudinaryService {
         },
         (error, result) => {
           if (error) return reject(error);
+          console.log(error);
           resolve(result as UploadApiResponse);
         },
       );

@@ -79,7 +79,7 @@ enum Role {
 model UserSocialMedia {
   id        String     @id @default(uuid())
   userId    String @unique
-  faceBook  String?
+  facebook  String?
   youtube   String?     
   twitter   String?
   instagram String?

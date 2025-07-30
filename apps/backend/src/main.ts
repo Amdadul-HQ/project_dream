@@ -12,7 +12,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: ['*'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
@@ -31,8 +31,8 @@ async function bootstrap() {
 
   // ✅ Swagger config with Bearer Auth
   const config = new DocumentBuilder()
-    .setTitle('Jesus VLSCO')
-    .setDescription('Jesus VLSCO API description')
+    .setTitle('Project Dream')
+    .setDescription('Project Dream API description')
     .setVersion('1.0')
     .addBearerAuth()
     .build();

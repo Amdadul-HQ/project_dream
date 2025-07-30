@@ -65,7 +65,7 @@ import { AppService } from './app.service';
     LibModule,
   ],
   controllers: [AppController],
-  providers: [JwtStrategy,AppService],
+  providers: [JwtStrategy, AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
