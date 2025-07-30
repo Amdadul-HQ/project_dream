@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Post,
@@ -41,8 +40,6 @@ export class AuthController {
     @Body() registerUserDto: RegisterUserDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log(registerUserDto, 'body');
-    console.log(file, 'file');
     let uploadedUrl: any = null;
 
     if (file) {

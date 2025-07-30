@@ -27,8 +27,6 @@ export class AuthService {
         throw new BadRequestException('Profile image is required');
       }
 
-      console.log(file)
-
       // 2️⃣ Check if user already exists
       const existingUser = await this.prisma.user.findUnique({
         where: { email: dto.email },
