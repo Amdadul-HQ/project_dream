@@ -16,7 +16,6 @@ model User {
   name     String
   phone    String?
   email    String
-  password  String
   address  String?
   profile  String?
   isVerified Boolean       @default(false)
@@ -34,8 +33,23 @@ model User {
    // 👇 Follower system
   followers      Follow[] @relation("Followee")
   following      Follow[] @relation("Follower")
+  Auth Auth[]
   
 
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+}
+
+// auth module
+model Auth {
+  id       String      @id @default(uuid())
+  email     String  @unique
+  name      String
+  password  String
+  role      Role
+  userId    String @unique
+  user      User?  @relation(fields: [userId],references: [id])
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
@@ -66,11 +80,11 @@ enum Role {
 model UserSocialMedia {
   id        String     @id @default(uuid())
   userId    String @unique
-  faceBook  String
-  youtube   String      
-  twitter   String
-  instagram String
-  pinterest String
+  faceBook  String?
+  youtube   String?     
+  twitter   String?
+  instagram String?
+  pinterest String?
 
 
   user      User        @relation(fields: [userId],references: [id])
