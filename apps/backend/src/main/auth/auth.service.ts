@@ -28,7 +28,7 @@ export class AuthService {
       }
 
       // 2️⃣ Check if user already exists
-      const existingUser = await this.prisma.user.findUnique({
+      const existingUser = await this.prisma.user.findFirstOrThrow({
         where: { email: dto.email },
       });
       if (existingUser) {
@@ -51,7 +51,7 @@ export class AuthService {
             phone: dto.phone,
             address: dto.address,
             profile: file,
-            role: Role.USER,
+            role: Role.USER
           },
         });
 
