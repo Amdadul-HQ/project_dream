@@ -3,11 +3,16 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
 import { PrismaService } from '@project/lib/prisma/prisma.service';
 import { RegisterUserDto } from './dto/auth.dto';
+import { LoginDto } from './dto/login.dto';
+import { UtilsService } from '@project/lib/utils/utils.service';
+import { successResponse } from '@project/common/utils/response.util';
 // import { AppError } from '@project/common/error/handle-error.app';
 // import { CloudinaryService } from '@project/lib/cloudinary/cloudinary.service';
 // import { HandleError } from '@project/common/error/handle-error.decorator';
@@ -15,7 +20,8 @@ import { RegisterUserDto } from './dto/auth.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
+    private readonly prisma: PrismaService,
+    private readonly libUtils: UtilsService,
     // private readonly cloudinaryService: CloudinaryService,
   ) {}
 
@@ -100,6 +106,44 @@ export class AuthService {
         'Internal server error during registration',
       );
     }
+  }
+
+  async login (loginDto:LoginDto) {
+      const {email,password} = loginDto
+
+      const user = await this.prisma.user.findUnique({
+        where:{email}
+      })
+
+      if (!user) {
+        throw new NotFoundException('User does not exist');
+      }
+
+      const creadintials = await this.prisma.auth.findUnique({
+        where:{userId:user.id}
+      })
+
+      if(!creadintials) {
+        throw new NotFoundException('User does not exist');
+      }
+       const isPasswordMatch = await this.libUtils.comparePassword({
+        password,
+        hashedPassword: creadintials.password,
+      });
+
+      if (!isPasswordMatch) {
+        throw new UnauthorizedException('Password does not match');
+      }
+
+      const data = {
+      user,
+      token: this.libUtils.generateToken({
+        email: user.email,
+        roles: user.role,
+        sub: user.id,
+      }),
+    };
+     return successResponse(data, 'Login successful');
   }
 
   //   async googleLogin(token: string) {

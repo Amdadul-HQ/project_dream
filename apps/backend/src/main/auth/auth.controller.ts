@@ -11,6 +11,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { registerUserSwaggerSchema } from './dto/registration.swagger';
 import { RegisterUserDto } from './dto/auth.dto';
 import { CloudinaryService } from '@project/lib/cloudinary/cloudinary.service';
+import { LoginDto } from './dto/login.dto';
 
 @ApiTags('Auth ---')
 @Controller('auth')
@@ -20,6 +21,7 @@ export class AuthController {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
+  // user Registration
   @Post('registration')
   @ApiOperation({ summary: 'User Registration' })
   @ApiConsumes('multipart/form-data')
@@ -53,4 +55,12 @@ export class AuthController {
       uploadedUrl?.url || null,
     );
   }
+
+
+  // User login
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    return await this.authService.login(loginDto);
+  }  
+
 }

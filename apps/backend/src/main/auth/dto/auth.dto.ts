@@ -1,48 +1,76 @@
 // src/auth/dto/register-user.dto.ts
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, Length, MinLength } from 'class-validator';
 
 export class RegisterUserDto {
+  @ApiProperty({
+    description: 'User Name',
+    example: 'Amdadul Haque',
+    required: true,
+  })
   @IsString()
   name: string;
 
-  @IsEmail()
+  @ApiProperty({
+    description: 'User email address',
+    example: 'user@example.com',
+    required: true,
+  })
+  @IsNotEmpty({ message: 'Email is required' })
+  @IsEmail({}, { message: 'Invalid email format' })
+  @Length(5, 255, { message: 'Email must be between 5 and 255 characters' })
   email: string;
 
+  @ApiProperty({
+    description: 'User Phone',
+    example: '+8801756171239',
+    required: true,
+  })
   @IsString()
+  @IsPhoneNumber()
   phone: string;
 
   @IsString()
   address: string;
 
-  @MinLength(6)
+  @ApiProperty({
+    description: 'User password',
+    example: 'Password123!',
+    required: true,
+    minLength: 8,
+    maxLength: 32,
+  })
+  @IsNotEmpty({ message: 'Password is required' })
+  @IsString({ message: 'Password must be a string' })
+  @Length(8, 32, { message: 'Password must be between 8 and 32 characters' })
   password: string;
 
   // Optional social media fields
   @IsOptional()
-  @IsString()
+  @IsString({message:'Link with https'})
   facebook?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({message:'Link with https'})
   youtube?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({message:'Link with https'})
   twitter?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({message:'Link with https'})
   instagram?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({message:'Link with https'})
   pinterest?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({message:'Link with https'})
   linkedin?: string;
 
   @IsOptional()
-  @IsString()
+ @IsString({message:'Link with https'})
   tiktok?: string;
 }

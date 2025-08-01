@@ -73,4 +73,25 @@ export class UtilsService {
     if (!user) throw new AppError(404, 'User not found');
     return user.email;
   }
+
+  async hashPassword({
+        password,
+        round = 6
+    }: {
+        password: string,
+        round?: number
+    }): Promise<string> {
+        return bcrypt.hash(password, round);
+    }
+
+  async comparePassword({
+        hashedPassword,
+        password
+    }: {
+        password: string,
+        hashedPassword: string
+    }): Promise<boolean> {
+        return bcrypt.compare(password, hashedPassword);
+    }
+
 }
