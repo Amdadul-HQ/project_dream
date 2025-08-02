@@ -92,7 +92,7 @@ export class UpdatePostService {
 
       // Perform the update
       return await tx.post.update({
-        where: { id: postId },
+        where: { id: postId, writerId: updatePostDto.writerId },
         data: updateData,
       });
     });

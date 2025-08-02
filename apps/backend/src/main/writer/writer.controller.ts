@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Param,
+  Patch,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -21,6 +22,8 @@ import { CloudinaryService } from '@project/lib/cloudinary/cloudinary.service';
 import { CreatePostService } from './service/create-post.service';
 import { UpdatePostService } from './service/update-post.service';
 import { UpdatePostDto } from './dto/updatePost.dto';
+import { updatePostSwaggerSchema } from './dto/updatePost.swagger';
+import { AppError } from '@project/common/error/handle-error.app';
 
 @ApiTags('Writer ---')
 @Controller('writer/post')
@@ -64,11 +67,28 @@ export class WriterController {
   }
 
   //Update a post
+  @Patch(':postId')
+  @ApiOperation({ summary: 'Updated a post' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Post update form data with image',
+    schema: {
+      type: 'object',
+      properties: {
+        ...updatePostSwaggerSchema.properties,
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('thumbnail'))
   async updatePost(
     @Param('postId') postId: string,
     @Body() dto: UpdatePostDto,
     @UploadedFile() file: Express.Multer.File,
+    @GetUser('userId') userId: string,
   ) {
+    if (!userId) {
+      throw new AppError(500, 'User id invalied!!!');
+    }
     let uploadedUrl;
     if (file) {
       uploadedUrl = await this.cloudinaryService.uploadImageFromBuffer(
@@ -76,6 +96,7 @@ export class WriterController {
         file.originalname,
       );
     }
+    dto.writerId = userId;
     return this.updatePostService.updatePost(
       postId,
       dto,
