@@ -12,58 +12,56 @@ datasource db {
 
 // User Model 
 model User {
-  id       String      @id @default(uuid())
-  name     String
-  phone    String?
-  email    String     @unique
-  address  String?
-  profile  String?
-  isVerified Boolean       @default(false)
-  role      Role           @default(USER)
-  isGoogle  Boolean     @default(false)
-  status    UserStatus  @default(Active)
+  id              String           @id @default(uuid())
+  name            String
+  phone           String?
+  email           String           @unique
+  address         String?
+  profile         String?
+  isVerified      Boolean          @default(false)
+  role            Role             @default(USER)
+  isGoogle        Boolean          @default(false)
+  status          UserStatus       @default(Active)
 
+  socialMedia     UserSocialMedia?
+  likedPost       Post[]
+  posts           Post[]           @relation(name: "writer")
+  commentsPost    Comment[]
 
-  socialMedia UserSocialMedia?
-  likedPost   Post[]
-  post Post[] @relation(name: "writer")
-  commentsPost Comment[]
+  // 👇 Follower system
+  followers       Follow[]         @relation("Followee")
+  following       Follow[]         @relation("Follower")
+  Auth            Auth[]
 
-   // 👇 Follower system
-  followers      Follow[] @relation("Followee")
-  following      Follow[] @relation("Follower")
-  Auth Auth[]
-  
-
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
 }
 
 // auth module
 model Auth {
-  id       String      @id @default(uuid())
-  email     String  @unique
-  name      String
-  password  String
-  role      Role
-  userId    String @unique
-  user      User?  @relation(fields: [userId],references: [id])
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id              String           @id @default(uuid())
+  email           String           @unique
+  name            String
+  password        String
+  role            Role
+  userId          String           @unique
+  user            User?            @relation(fields: [userId], references: [id])
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
 // follwer system model
 model Follow {
-  id         String   @id @default(uuid())
-  
-  followerId String
-  followeeId String
+  id              String           @id @default(uuid())
 
-  follower   User     @relation("Follower", fields: [followerId], references: [id])
-  followee   User     @relation("Followee", fields: [followeeId], references: [id])
+  followerId      String
+  followeeId      String
 
-  createdAt  DateTime @default(now())
+  follower        User             @relation("Follower", fields: [followerId], references: [id])
+  followee        User             @relation("Followee", fields: [followeeId], references: [id])
+
+  createdAt       DateTime         @default(now())
 
   @@unique([followerId, followeeId]) // prevent duplicate follows
 }
@@ -77,22 +75,21 @@ enum Role {
 
 // User Socal media 
 model UserSocialMedia {
-  id        String     @id @default(uuid())
-  userId    String @unique
-  facebook  String?
-  youtube   String?     
-  twitter   String?
-  instagram String?
-  pinterest String?
-  linkedin  String?  
-  tiktok    String?   
+  id              String           @id @default(uuid())
+  userId          String           @unique
+  facebook        String?
+  youtube         String?
+  twitter         String?
+  instagram       String?
+  pinterest       String?
+  linkedin        String?
+  tiktok          String?
+
+  user            User             @relation(fields: [userId], references: [id])
 
 
-  user      User        @relation(fields: [userId],references: [id])
-  
-  
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
 
@@ -106,26 +103,30 @@ enum UserStatus {
 
 // Post model
 model Post {
-  id        String      @id @default(uuid())
-  seriesid  String?     @unique
-  categoryid String
-  userId    String?     @unique
+  id            String           @id @default(uuid())
+
+  seriesId      String?
+  series        Series?          @relation(fields: [seriesId], references: [id])
   
-  title     String
-  content   Json
-  likeCount Int         @default(0)
-  commentCount  Int     @default(0)
+  part          Int?             @unique
 
-  series    Series?     @relation(fields: [seriesid], references: [id])
-  category  Category[]
-  writer    User?       @relation(name: "writer", fields: [userId], references: [id])
-  like      User[]
-  comments  Comment[]
+  categories    Category[]
 
-  status    PostStatus
+  writerId      String?
+  writer        User?            @relation(name: "writer", fields: [writerId], references: [id])
 
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  title         String
+  content       Json
+  likeCount     Int              @default(0)
+  commentCount  Int              @default(0)
+
+  like          User[]
+  comments      Comment[]
+
+  status        PostStatus       @default(PUBLISHED)
+
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 }
 
 // Post Status
@@ -177,11 +178,9 @@ model Comment {
 model Series {
   id        String      @id @default(uuid())
   name      String      @unique
-  postId    String      @unique
-  categoryid String?
-  category  Category[]
-  post      Post[]
-
+  
+  // A series can have many posts
+  posts     Post[]
 
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
@@ -192,11 +191,12 @@ model Series {
 model Category {
   id      String      @id   @default(uuid())
   name    String      @unique
-  series  Series[]
-  post    Post[]
-
+  
+  // A category can have many posts
+  posts   Post[]
 
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
+
 

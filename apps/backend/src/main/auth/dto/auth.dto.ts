@@ -1,6 +1,13 @@
 // src/auth/dto/register-user.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, Length, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class RegisterUserDto {
   @ApiProperty({
@@ -47,30 +54,30 @@ export class RegisterUserDto {
 
   // Optional social media fields
   @IsOptional()
-  @IsString({message:'Link with https'})
+  @IsString({ message: 'Link with https' })
   facebook?: string;
 
   @IsOptional()
-  @IsString({message:'Link with https'})
+  @IsString({ message: 'Link with https' })
   youtube?: string;
 
   @IsOptional()
-  @IsString({message:'Link with https'})
+  @IsString({ message: 'Link with https' })
   twitter?: string;
 
   @IsOptional()
-  @IsString({message:'Link with https'})
+  @IsString({ message: 'Link with https' })
   instagram?: string;
 
   @IsOptional()
-  @IsString({message:'Link with https'})
+  @IsString({ message: 'Link with https' })
   pinterest?: string;
 
   @IsOptional()
-  @IsString({message:'Link with https'})
+  @IsString({ message: 'Link with https' })
   linkedin?: string;
 
   @IsOptional()
- @IsString({message:'Link with https'})
+  @IsString({ message: 'Link with https' })
   tiktok?: string;
 }

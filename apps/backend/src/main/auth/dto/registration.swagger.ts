@@ -23,13 +23,6 @@ export const registerUserSwaggerSchema = {
       format: 'password',
       example: 'StrongPass123!',
     },
-    // profile: {
-    //   type: 'string',
-    //   format: 'binary',
-    //   description: 'User profile picture',
-    // },
-
-    // Social Media Links (Optional)
     facebook: {
       type: 'string',
       example: 'https://facebook.com/johndoe',

@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ValidateAuth } from '@project/common/jwt/jwt.decorator';
 
@@ -7,26 +7,16 @@ import { ValidateAuth } from '@project/common/jwt/jwt.decorator';
 @ApiBearerAuth()
 @ValidateAuth()
 export class WriterController {
+  //create a post
+  @Post()
+  async createPost() {}
 
+  //Update a post
+  async updatePost() {}
 
-    //create a post
-    async createPost() {
+  //Writer all post
+  async myPost() {}
 
-    }
-
-    //Update a post
-    async updatePost(){
-
-    }
-
-    //Writer all post
-    async myPost(){
-
-    }
-
-    //writer delet post
-    async deletePost(){
-
-    }
-
+  //writer delet post
+  async deletePost() {}
 }
