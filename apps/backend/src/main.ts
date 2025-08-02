@@ -27,7 +27,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  app.setGlobalPrefix('js');
+  app.setGlobalPrefix('ts');
 
   // ✅ Swagger config with Bearer Auth
   const config = new DocumentBuilder()
@@ -38,7 +38,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('js/docs', app, document);
+  SwaggerModule.setup('ts/docs', app, document);
 
   const port = parseInt(configService.get<string>(ENVEnum.PORT) ?? '5000', 10);
   await app.listen(port);

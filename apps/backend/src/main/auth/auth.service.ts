@@ -57,7 +57,7 @@ export class AuthService {
             phone: dto.phone,
             address: dto.address,
             profile: file,
-            role: Role.USER
+            role: Role.USER,
           },
         });
 
@@ -108,34 +108,34 @@ export class AuthService {
     }
   }
 
-  async login (loginDto:LoginDto) {
-      const {email,password} = loginDto
+  async login(loginDto: LoginDto) {
+    const { email, password } = loginDto;
 
-      const user = await this.prisma.user.findUnique({
-        where:{email}
-      })
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
 
-      if (!user) {
-        throw new NotFoundException('User does not exist');
-      }
+    if (!user) {
+      throw new NotFoundException('User does not exist');
+    }
 
-      const creadintials = await this.prisma.auth.findUnique({
-        where:{userId:user.id}
-      })
+    const creadintials = await this.prisma.auth.findUnique({
+      where: { userId: user.id },
+    });
 
-      if(!creadintials) {
-        throw new NotFoundException('User does not exist');
-      }
-       const isPasswordMatch = await this.libUtils.comparePassword({
-        password,
-        hashedPassword: creadintials.password,
-      });
+    if (!creadintials) {
+      throw new NotFoundException('User does not exist');
+    }
+    const isPasswordMatch = await this.libUtils.comparePassword({
+      password,
+      hashedPassword: creadintials.password,
+    });
 
-      if (!isPasswordMatch) {
-        throw new UnauthorizedException('Password does not match');
-      }
+    if (!isPasswordMatch) {
+      throw new UnauthorizedException('Password does not match');
+    }
 
-      const data = {
+    const data = {
       user,
       token: this.libUtils.generateToken({
         email: user.email,
@@ -143,7 +143,7 @@ export class AuthService {
         sub: user.id,
       }),
     };
-     return successResponse(data, 'Login successful');
+    return successResponse(data, 'Login successful');
   }
 
   //   async googleLogin(token: string) {
