@@ -35,6 +35,15 @@ export class CreatePostDto {
   content: any; // Use 'any' since JSON structure can be dynamic
 
   @ApiProperty({
+    description: 'Writer Id',
+    example: '09876543-210e-dcba-9876-543210fedcba',
+    required: true,
+  })
+  @IsNotEmpty({ message: 'Writer Id must be givien' })
+  @IsUUID()
+  writerId: string;
+
+  @ApiProperty({
     description: 'The IDs of the categories for the post',
     example: [
       '09876543-210e-dcba-9876-543210fedcba',

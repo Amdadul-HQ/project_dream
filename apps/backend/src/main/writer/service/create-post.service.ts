@@ -19,7 +19,9 @@ export class CreatePostService {
     createPostDto: CreatePostDto,
     thumbnail: string,
   ): Promise<Post> {
-    const { seriesId, seriesname, categoryIds, ...postData } = createPostDto;
+    // Destructure writerId separately to use with Prisma's connect syntax
+    const { seriesId, seriesname, categoryIds, writerId, ...postData } =
+      createPostDto;
 
     // Use a Prisma transaction to ensure atomicity for creating the series and the post.
     return this.prisma.$transaction(async (tx) => {
@@ -49,10 +51,7 @@ export class CreatePostService {
         });
 
         // The part number is the last part + 1, or 1 if it's the first post.
-        nextPartNumber =
-          lastPostInSeries && lastPostInSeries.part !== null
-            ? lastPostInSeries.part + 1
-            : 1;
+        nextPartNumber = (lastPostInSeries?.part ?? 0) + 1;
 
         postSeriesId = seriesId;
       }
@@ -65,6 +64,11 @@ export class CreatePostService {
         data: {
           ...postData,
           thumbnail,
+          writer: {
+            connect: {
+              id: writerId,
+            },
+          },
           series: postSeriesId ? { connect: { id: postSeriesId } } : undefined,
           categories: { connect: categoriesToConnect },
           part: nextPartNumber,

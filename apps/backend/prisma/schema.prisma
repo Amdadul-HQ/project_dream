@@ -114,8 +114,8 @@ model Post {
 
   categories    Category[]
 
-  writerId      String?
-  writer        User?            @relation(name: "writer", fields: [writerId], references: [id])
+  writerId      String
+  writer        User           @relation(name: "writer", fields: [writerId], references: [id])
 
   title         String
   content       Json
