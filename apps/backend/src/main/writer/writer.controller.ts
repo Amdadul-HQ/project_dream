@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -28,6 +29,7 @@ import { updatePostSwaggerSchema } from './dto/updatePost.swagger';
 import { AppError } from '@project/common/error/handle-error.app';
 import { GetPostsDto } from './dto/getPost.dto';
 import { PostsService } from './service/getmypost.service';
+import { DeletePostService } from './service/delete-post.service';
 
 @ApiTags('Writer ---')
 @Controller('writer/post')
@@ -39,6 +41,7 @@ export class WriterController {
     private readonly cloudinaryService: CloudinaryService,
     private readonly updatePostService: UpdatePostService,
     private readonly postsService: PostsService,
+    private readonly deleteService: DeletePostService,
   ) {}
 
   //create a post
@@ -122,5 +125,14 @@ export class WriterController {
   }
 
   //writer delet post
-  async deletePost() {}
+  @Delete(':postId')
+  @ApiOperation({
+    summary: 'Delete Post',
+  })
+  async deletePost(
+    @Param('postId') postId: string,
+    @GetUser('userId') writerId: string,
+  ) {
+    return await this.deleteService.deletePost(writerId, postId);
+  }
 }
