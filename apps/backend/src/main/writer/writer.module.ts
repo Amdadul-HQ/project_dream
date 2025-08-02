@@ -4,6 +4,7 @@ import { WriterService } from './service/writer.service';
 import { CreatePostService } from './service/create-post.service';
 import { CloudinaryService } from '@project/lib/cloudinary/cloudinary.service';
 import { UpdatePostService } from './service/update-post.service';
+import { PostsService } from './service/getmypost.service';
 
 @Module({
   controllers: [WriterController],
@@ -12,6 +13,7 @@ import { UpdatePostService } from './service/update-post.service';
     CreatePostService,
     CloudinaryService,
     UpdatePostService,
+    PostsService,
   ],
 })
 export class WriterModule {}

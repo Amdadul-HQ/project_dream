@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -24,6 +26,8 @@ import { UpdatePostService } from './service/update-post.service';
 import { UpdatePostDto } from './dto/updatePost.dto';
 import { updatePostSwaggerSchema } from './dto/updatePost.swagger';
 import { AppError } from '@project/common/error/handle-error.app';
+import { GetPostsDto } from './dto/getPost.dto';
+import { PostsService } from './service/getmypost.service';
 
 @ApiTags('Writer ---')
 @Controller('writer/post')
@@ -34,6 +38,7 @@ export class WriterController {
     private readonly createPostService: CreatePostService,
     private readonly cloudinaryService: CloudinaryService,
     private readonly updatePostService: UpdatePostService,
+    private readonly postsService: PostsService,
   ) {}
 
   //create a post
@@ -105,7 +110,16 @@ export class WriterController {
   }
 
   //Writer all post
-  async myPost() {}
+  @Get('my-posts')
+  @ApiOperation({
+    summary: 'Get all posts by a specific writer with filters and pagination',
+  })
+  async myPost(
+    @GetUser('userId') writerId: string,
+    @Query() query: GetPostsDto,
+  ) {
+    return this.postsService.getMyAllPosts(writerId, query);
+  }
 
   //writer delet post
   async deletePost() {}
