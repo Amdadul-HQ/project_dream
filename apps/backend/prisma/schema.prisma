@@ -108,6 +108,8 @@ model Post {
   seriesId      String?
   series        Series?          @relation(fields: [seriesId], references: [id])
   
+  thumbnail     String 
+
   part          Int?             @unique
 
   categories    Category[]

@@ -4,11 +4,9 @@ import {
   IsNotEmpty,
   IsOptional,
   IsUUID,
-  IsEnum,
   IsArray,
   ArrayMinSize,
 } from 'class-validator';
-import { PostStatus } from '@prisma/client';
 
 export class CreatePostDto {
   @ApiProperty({
@@ -67,14 +65,4 @@ export class CreatePostDto {
   @IsOptional()
   @IsUUID('4', { message: 'Series ID must be a valid UUID' })
   seriesId?: string;
-
-  @ApiProperty({
-    description: 'The initial status of the post',
-    enum: PostStatus,
-    example: PostStatus.PUBLISHED,
-    required: true,
-  })
-  @IsNotEmpty({ message: 'Status is required' })
-  @IsEnum(PostStatus)
-  status: PostStatus;
 }

@@ -15,7 +15,10 @@ export class CreatePostService {
    * @param createPostDto The DTO for post creation.
    * @returns The newly created Post object.
    */
-  async createPost(createPostDto: CreatePostDto): Promise<Post> {
+  async createPost(
+    createPostDto: CreatePostDto,
+    thumbnail: string,
+  ): Promise<Post> {
     const { seriesId, seriesname, categoryIds, ...postData } = createPostDto;
 
     // Use a Prisma transaction to ensure atomicity for creating the series and the post.
@@ -61,6 +64,7 @@ export class CreatePostService {
       return await tx.post.create({
         data: {
           ...postData,
+          thumbnail,
           series: postSeriesId ? { connect: { id: postSeriesId } } : undefined,
           categories: { connect: categoriesToConnect },
           part: nextPartNumber,
