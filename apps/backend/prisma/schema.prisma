@@ -126,9 +126,11 @@ model Post {
   comments      Comment[]
 
   status        PostStatus       @default(PUBLISHED)
+  audio         Audio?
 
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
+
 }
 
 // Post Status
@@ -186,6 +188,8 @@ model Series {
 
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+
+  audio     Audio[]
 }
 
 
@@ -200,5 +204,26 @@ model Category {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
+
+model Audio {
+  id               String      @id @default(uuid())
+  postId           String      @unique
+  seriesId         String?     // Optional, as not all posts may belong to a series
+
+  post             Post        @relation(fields: [postId], references: [id])
+  series           Series?     @relation(fields: [seriesId], references: [id])
+
+  part             Int?        // Optional tracking of the series part
+  filename         String
+  originalFilename String
+  path             String
+  url              String
+  mimeType         String
+  size             Int
+
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+
 
 
