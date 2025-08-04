@@ -2,10 +2,14 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '@project/lib/prisma/prisma.service';
 import { CreatePostDto } from '../dto/createPost.dto';
 import { Post, Series } from '@prisma/client';
+import { CloudinaryService } from '@project/lib/cloudinary/cloudinary.service';
 
 @Injectable()
 export class CreatePostService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   /**
    * Creates a new post.
@@ -18,10 +22,11 @@ export class CreatePostService {
   async createPost(
     createPostDto: CreatePostDto,
     thumbnail: string,
+    audio?: Express.Multer.File,
+    writerId?: string,
   ): Promise<Post> {
     // Destructure writerId separately to use with Prisma's connect syntax
-    const { seriesId, seriesname, categoryIds, writerId, ...postData } =
-      createPostDto;
+    const { seriesId, seriesname, categoryIds, ...postData } = createPostDto;
 
     // Use a Prisma transaction to ensure atomicity for creating the series and the post.
     return this.prisma.$transaction(async (tx) => {
@@ -60,7 +65,7 @@ export class CreatePostService {
       const categoriesToConnect = categoryIds.map((id) => ({ id }));
 
       // Create the post with the appropriate series connection and part number.
-      return await tx.post.create({
+      const createdPost = await tx.post.create({
         data: {
           ...postData,
           thumbnail,
@@ -74,6 +79,16 @@ export class CreatePostService {
           part: nextPartNumber,
         },
       });
+      if (audio) {
+        await this.cloudinaryService.processUploadedAudio(
+          audio,
+          createdPost.id,
+          postSeriesId,
+          nextPartNumber,
+        );
+      }
+
+      return createdPost;
     });
   }
 }

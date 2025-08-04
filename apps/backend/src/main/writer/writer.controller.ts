@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import {
@@ -19,7 +20,10 @@ import {
 } from '@nestjs/swagger';
 import { GetUser, ValidateAuth } from '@project/common/jwt/jwt.decorator';
 import { createPostSwaggerSchema } from './dto/createPost.swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+} from '@nestjs/platform-express';
 import { CreatePostDto } from './dto/createPost.dto';
 import { CloudinaryService } from '@project/lib/cloudinary/cloudinary.service';
 import { CreatePostService } from './service/create-post.service';
@@ -49,29 +53,62 @@ export class WriterController {
   @ApiOperation({ summary: 'Create a new post' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    description: 'Post creation form data with image',
+    description: 'Post creation form data with image and audio',
     schema: {
       type: 'object',
       properties: {
         ...createPostSwaggerSchema.properties,
+        thumbnail: {
+          type: 'string',
+          format: 'binary',
+        },
+        audio: {
+          type: 'string',
+          format: 'binary',
+        },
       },
     },
   })
-  @UseInterceptors(FileInterceptor('thumbnail'))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'thumbnail', maxCount: 1 },
+      { name: 'audio', maxCount: 1 },
+    ]),
+  )
   async createPost(
     @Body() dto: CreatePostDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles()
+    files: {
+      thumbnail: Express.Multer.File[];
+      audio?: Express.Multer.File[];
+    },
     @GetUser('userId') userId: string,
   ) {
-    let uploadedUrl;
-    if (file) {
-      uploadedUrl = await this.cloudinaryService.uploadImageFromBuffer(
-        file.buffer,
-        file.originalname,
+    let thumbnailUrl;
+    let audio;
+
+    if (files.thumbnail?.[0]) {
+      const result = await this.cloudinaryService.uploadImageFromBuffer(
+        files.thumbnail[0].buffer,
+        files.thumbnail[0].originalname,
       );
+      thumbnailUrl = result.url;
     }
-    dto.writerId = userId;
-    return this.createPostService.createPost(dto, uploadedUrl?.url);
+
+    if (files.audio?.[0]) {
+      // const result = await this.cloudinaryService.uploadAudioFromBuffer(
+      //   files.audio[0].buffer,
+      //   files.audio[0].originalname,
+      // );
+      audio = files.audio?.[0];
+    }
+
+    return this.createPostService.createPost(
+      dto,
+      thumbnailUrl,
+      audio,
+      userId as string,
+    );
   }
 
   //Update a post
@@ -104,11 +141,11 @@ export class WriterController {
         file.originalname,
       );
     }
-    dto.writerId = userId;
     return this.updatePostService.updatePost(
       postId,
       dto,
       uploadedUrl?.url || undefined,
+      userId,
     );
   }
 

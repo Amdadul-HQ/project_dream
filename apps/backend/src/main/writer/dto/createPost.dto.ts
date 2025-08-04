@@ -34,14 +34,14 @@ export class CreatePostDto {
   @IsNotEmpty({ message: 'Content is required' })
   content: any; // Use 'any' since JSON structure can be dynamic
 
-  @ApiProperty({
-    description: 'Writer Id',
-    example: '09876543-210e-dcba-9876-543210fedcba',
-    required: true,
-  })
-  @IsNotEmpty({ message: 'Writer Id must be givien' })
-  @IsUUID()
-  writerId: string;
+  // @ApiProperty({
+  //   description: 'Writer Id',
+  //   example: '09876543-210e-dcba-9876-543210fedcba',
+  //   required: true,
+  // })
+  // @IsNotEmpty({ message: 'Writer Id must be givien' })
+  // // @IsUUID()
+  // writerId: string;
 
   @ApiProperty({
     description: 'The IDs of the categories for the post',
@@ -54,7 +54,7 @@ export class CreatePostDto {
   @IsNotEmpty({ message: 'At least one category ID is required' })
   @IsArray({ message: 'Category IDs must be an array' })
   @ArrayMinSize(1, { message: 'At least one category ID is required' })
-  @IsUUID('4', { each: true, message: 'Each category ID must be a valid UUID' })
+  // @IsUUID('4', { each: true, message: 'Each category ID must be a valid UUID' })
   categoryIds: string[];
 
   @ApiProperty({
@@ -72,6 +72,6 @@ export class CreatePostDto {
     required: false,
   })
   @IsOptional()
-  @IsUUID('4', { message: 'Series ID must be a valid UUID' })
+  // @IsUUID('4', { message: 'Series ID must be a valid UUID' })
   seriesId?: string;
 }

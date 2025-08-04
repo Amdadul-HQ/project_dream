@@ -23,6 +23,7 @@ export class UpdatePostService {
     postId: string,
     updatePostDto: UpdatePostDto,
     thumbnail?: string,
+    writerId?: string,
   ): Promise<Post> {
     const { seriesId, seriesname, categoryIds, ...postData } = updatePostDto;
 
@@ -92,7 +93,7 @@ export class UpdatePostService {
 
       // Perform the update
       return await tx.post.update({
-        where: { id: postId, writerId: updatePostDto.writerId },
+        where: { id: postId, writerId },
         data: updateData,
       });
     });
