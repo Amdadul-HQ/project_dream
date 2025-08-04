@@ -22,6 +22,31 @@ export class CloudinaryService {
     });
   }
 
+  async uploadAudioFromBuffer(
+    fileBuffer: Buffer,
+    filename: string,
+    folder = 'project-dream/audio',
+  ): Promise<UploadApiResponse> {
+    return new Promise((resolve, reject) => {
+      const originalNameWithoutExt = filename.replace(/\.[^/.]+$/, '');
+
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder,
+          public_id: originalNameWithoutExt,
+          resource_type: 'video', // Required for audio files
+          format: 'mp3', // Optional: specify output format
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result as UploadApiResponse);
+        },
+      );
+
+      Readable.from(fileBuffer).pipe(stream);
+    });
+  }
+
   async uploadImageFromBuffer(
     fileBuffer: Buffer,
     filename: string,
