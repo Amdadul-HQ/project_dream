@@ -13,6 +13,8 @@ import { RegisterUserDto } from './dto/auth.dto';
 import { LoginDto } from './dto/login.dto';
 import { UtilsService } from '@project/lib/utils/utils.service';
 import { successResponse } from '@project/common/utils/response.util';
+import { google, oauth2_v2 } from 'googleapis';
+import { Credentials } from 'google-auth-library';
 // import { AppError } from '@project/common/error/handle-error.app';
 // import { CloudinaryService } from '@project/lib/cloudinary/cloudinary.service';
 // import { HandleError } from '@project/common/error/handle-error.decorator';
@@ -24,6 +26,12 @@ export class AuthService {
     private readonly libUtils: UtilsService,
     // private readonly cloudinaryService: CloudinaryService,
   ) {}
+
+  private oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    'https://developers.google.com/oauthplayground', // must match Playground
+  );
 
   //   @HandleError('Registration Failed')
   async register(dto: RegisterUserDto, file: string | null) {
@@ -146,32 +154,56 @@ export class AuthService {
     return successResponse(data, 'Login successful');
   }
 
-  //   async googleLogin(token: string) {
-  //     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+  async exchangeCodeForTokens(code: string): Promise<{
+  tokens: Credentials;
+  profile: oauth2_v2.Schema$Userinfo;
+}> {
+    const { tokens } = await this.oauth2Client.getToken(code);
+    this.oauth2Client.setCredentials(tokens);
 
-  //     const ticket = await client.verifyIdToken({
-  //       idToken: token,
-  //       audience: process.env.GOOGLE_CLIENT_ID,
-  //     });
+    const oauth2 = google.oauth2({ version: 'v2', auth: this.oauth2Client });
+    const { data } = await oauth2.userinfo.get();
 
-  //     const payload = ticket.getPayload();
-  //     if (!payload) throw new BadRequestException('Invalid Google token');
+    return {
+      tokens,
+      profile: data,
+    };
+  }
 
-  //     const { email, name, picture } = payload;
 
-  //     let user = await this.prisma.user.findUnique({ where: { email } });
+  async googleLogin(profile: any): Promise<{ accessToken: string,user:any }> {
+  try {
+    console.log('🔍 googleLogin input profile:', profile);
 
-  //     if (!user) {
-  //       user = await this.prisma.user.create({
-  //         data: {
-  //           name,
-  //           email,
-  //           profile: picture,
-  //           isGoogle: true,
-  //         },
-  //       });
-  //     }
+    const existingUser = await this.prisma.user.findFirst({
+      where: { email: profile.email },
+    });
 
-  //     return { message: 'Google login success', user };
-  //   }
+    if(existingUser){
+      throw new BadRequestException('User Already Exist!!!')
+    }
+    let user;
+
+    if (!existingUser) {
+      user = await this.prisma.user.create({
+        data: profile,
+      });
+      console.log('Created new user:', user);
+    }
+
+   const payload = {
+        email: user.email,
+        roles: user.role,
+        sub: user.id,
+};
+
+    const accessToken = await this.libUtils.generateToken(payload);
+    return { accessToken,user };
+  } catch (error) {
+    console.error(' Error in googleLogin:', error);
+    throw error;
+  }
+}
+
+
 }
