@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@project/lib/prisma/prisma.service';
 import { Post } from '@prisma/client';
-import { GetAllPostsDto } from '../dto/getPost.dto';
+import { PrismaService } from '@project/lib/prisma/prisma.service';
+import { GetAllPostsDto } from '../dto/getAllPost.dto';
 
 @Injectable()
-export class PostsService {
+export class AllPostService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
@@ -12,8 +12,7 @@ export class PostsService {
    * @param query The DTO containing filter, search, and pagination parameters.
    * @returns A promise that resolves to an object containing the posts and total count.
    */
-  async getMyAllPosts(
-    writerId: string,
+  async getAllPosts(
     query: GetAllPostsDto,
   ): Promise<{ posts: Post[]; total: number }> {
     const {
@@ -32,7 +31,7 @@ export class PostsService {
     const skip = (pageNumber - 1) * take;
 
     const where: any = {};
-    where.writerId = writerId;
+
     if (search) {
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },

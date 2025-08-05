@@ -58,7 +58,13 @@ export class GetAllPostsDto {
     required: false,
   })
   @IsOptional()
-  @IsIn(Object.values(PostStatus))
+  @IsIn([
+    PostStatus.UNDER_REVIEW,
+    PostStatus.DELETED,
+    PostStatus.HOLD,
+    PostStatus.PUBLISHED,
+    PostStatus.REPORTED,
+  ])
   status?: PostStatus;
 
   @ApiProperty({

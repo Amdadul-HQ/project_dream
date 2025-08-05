@@ -31,9 +31,9 @@ import { UpdatePostService } from './service/update-post.service';
 import { UpdatePostDto } from './dto/updatePost.dto';
 import { updatePostSwaggerSchema } from './dto/updatePost.swagger';
 import { AppError } from '@project/common/error/handle-error.app';
-import { GetPostsDto } from './dto/getPost.dto';
 import { PostsService } from './service/getmypost.service';
 import { DeletePostService } from './service/delete-post.service';
+import { GetAllPostsDto } from './dto/getPost.dto';
 
 @ApiTags('Writer ---')
 @Controller('writer/post')
@@ -152,7 +152,7 @@ export class WriterController {
   })
   async myPost(
     @GetUser('userId') writerId: string,
-    @Query() query: GetPostsDto,
+    @Query() query: GetAllPostsDto,
   ) {
     return this.postsService.getMyAllPosts(writerId, query);
   }
