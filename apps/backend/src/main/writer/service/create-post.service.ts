@@ -3,7 +3,6 @@ import { PrismaService } from '@project/lib/prisma/prisma.service';
 import { CreatePostDto } from '../dto/createPost.dto';
 import { Post, Series } from '@prisma/client';
 import { CloudinaryService } from '@project/lib/cloudinary/cloudinary.service';
-import { successResponse } from '@project/common/utils/response.util';
 
 @Injectable()
 export class CreatePostService {

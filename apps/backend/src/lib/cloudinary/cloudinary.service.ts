@@ -103,8 +103,6 @@ export class CloudinaryService {
     part?: number,
   ): Promise<Audio> {
     try {
-      console.log('DEBUG - path module:', path);
-      console.log('DEBUG - file.originalname:', file?.originalname);
       if (!file) {
         throw new InternalServerErrorException(
           'Uploaded audio file is missing',

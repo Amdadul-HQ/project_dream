@@ -84,14 +84,6 @@ export class WriterController {
     },
     @GetUser('userId') userId: string,
   ) {
-    if (files.audio?.[0]) {
-      const audioFile = files.audio[0];
-      console.log('Audio File Info:');
-      console.log('Original Name:', audioFile.originalname);
-      console.log('Mimetype:', audioFile.mimetype);
-      console.log('Size:', audioFile.size);
-      console.log('Buffer exists:', !!audioFile.buffer);
-    }
     let thumbnailUrl;
     let audio;
 
