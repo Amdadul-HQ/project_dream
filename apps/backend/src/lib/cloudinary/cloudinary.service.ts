@@ -1,3 +1,4 @@
+import * as path from 'path';
 import {
   Global,
   Injectable,
@@ -7,7 +8,6 @@ import { ConfigService } from '@nestjs/config';
 import { Audio } from '@prisma/client';
 import { ENVEnum } from '@project/common/enum/env.enum';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
-import path from 'path';
 import { Readable } from 'stream';
 import { v4 as uuidv4 } from 'uuid';
 import mime from 'mime-types';
@@ -103,6 +103,14 @@ export class CloudinaryService {
     part?: number,
   ): Promise<Audio> {
     try {
+      console.log('DEBUG - path module:', path);
+      console.log('DEBUG - file.originalname:', file?.originalname);
+      if (!file) {
+        throw new InternalServerErrorException(
+          'Uploaded audio file is missing',
+        );
+      }
+
       const uploadResult = await this.uploadAudioFromBuffer(
         file.buffer,
         file.originalname,
@@ -120,7 +128,7 @@ export class CloudinaryService {
         part,
         filename: `${fileId}${fileExt}`,
         originalFilename: file.originalname,
-        path: uploadResult.public_id, // Cloudinary public_id or use `secure_url` if needed
+        path: uploadResult.public_id,
         url: uploadResult.url,
         mimeType,
         size: file.size,

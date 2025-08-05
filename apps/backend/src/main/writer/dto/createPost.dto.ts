@@ -1,11 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsArray,
-  ArrayMinSize,
-} from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsString, IsNotEmpty, IsOptional, IsArray } from 'class-validator';
 
 export class CreatePostDto {
   @ApiProperty({
@@ -44,16 +39,19 @@ export class CreatePostDto {
 
   @ApiProperty({
     description: 'The IDs of the categories for the post',
-    example: [
-      '09876543-210e-dcba-9876-543210fedcba',
-      'a1b2c3d4-e5f6-7890-1234-567890abcdef',
-    ],
+    example: ['uuid1', 'uuid2'],
     required: true,
+    // isArray: true,
+    type: String,
   })
-  @IsNotEmpty({ message: 'At least one category ID is required' })
-  @IsArray({ message: 'Category IDs must be an array' })
-  @ArrayMinSize(1, { message: 'At least one category ID is required' })
-  // @IsUUID('4', { each: true, message: 'Each category ID must be a valid UUID' })
+  @IsArray()
+  // @IsUUID('all', { each: true })
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value.split(',').map((id) => id.trim());
+    }
+    return value;
+  })
   categoryIds: string[];
 
   @ApiProperty({

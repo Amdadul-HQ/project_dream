@@ -14,6 +14,12 @@ export class PostCategoryService {
       data: dto,
     });
 
-    return successResponse(category, 'Category Created successfull');
+    return successResponse(category, 'Category Created successfully');
+  }
+
+  @HandleError('Category Fetched Failed')
+  async getAllCategory() {
+    const categories = await this.prisma.category.findMany();
+    return successResponse(categories, 'Category Fetched Successfully');
   }
 }

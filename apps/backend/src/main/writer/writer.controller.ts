@@ -84,8 +84,21 @@ export class WriterController {
     },
     @GetUser('userId') userId: string,
   ) {
+    if (files.audio?.[0]) {
+      const audioFile = files.audio[0];
+      console.log('Audio File Info:');
+      console.log('Original Name:', audioFile.originalname);
+      console.log('Mimetype:', audioFile.mimetype);
+      console.log('Size:', audioFile.size);
+      console.log('Buffer exists:', !!audioFile.buffer);
+    }
     let thumbnailUrl;
     let audio;
+
+    // Convert categoryIds string -> array if needed
+    // if (dto.categoryIds && typeof dto.categoryIds === 'string') {
+    //   dto.categoryIds = dto.categoryIds?.split(',').map((id) => id.trim());
+    // }
 
     if (files.thumbnail?.[0]) {
       const result = await this.cloudinaryService.uploadImageFromBuffer(
@@ -96,19 +109,10 @@ export class WriterController {
     }
 
     if (files.audio?.[0]) {
-      // const result = await this.cloudinaryService.uploadAudioFromBuffer(
-      //   files.audio[0].buffer,
-      //   files.audio[0].originalname,
-      // );
       audio = files.audio?.[0];
     }
 
-    return this.createPostService.createPost(
-      dto,
-      thumbnailUrl,
-      audio,
-      userId as string,
-    );
+    return this.createPostService.createPost(dto, thumbnailUrl, audio, userId);
   }
 
   //Update a post

@@ -31,18 +31,21 @@ export const createPostSwaggerSchema = {
         '09876543-210e-dcba-9876-543210fedcba',
         'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       ],
-      description: 'The IDs of the categories for the post',
+      description:
+        'The IDs of the categories for the post. Must be sent as multiple form-data keys like: categoryIds=...&categoryIds=...',
     },
     seriesname: {
       type: 'string',
       example: 'Introduction to Node.js',
-      description: 'The unique name of the series',
+      description:
+        'The name of the series to create a new one. Cannot be used with seriesId together.',
     },
     seriesId: {
       type: 'string',
       format: 'uuid',
       example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
-      description: 'The ID of the series this post belongs to',
+      description:
+        'The ID of the existing series this post belongs to. Cannot be used with seriesname together.',
     },
     status: {
       type: 'string',
@@ -53,6 +56,12 @@ export const createPostSwaggerSchema = {
     thumbnail: {
       type: 'string',
       format: 'binary',
+      description: 'Thumbnail image file (required)',
+    },
+    audio: {
+      type: 'string',
+      format: 'binary',
+      description: 'Optional audio file',
     },
   },
   required: ['title', 'content', 'categoryIds', 'status', 'thumbnail'],

@@ -75,6 +75,7 @@ export class PostsService {
         writer: { select: { id: true, name: true, profile: true } },
         series: true,
         categories: true,
+        audio: true,
       },
     });
 

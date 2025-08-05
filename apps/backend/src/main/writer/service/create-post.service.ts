@@ -3,6 +3,7 @@ import { PrismaService } from '@project/lib/prisma/prisma.service';
 import { CreatePostDto } from '../dto/createPost.dto';
 import { Post, Series } from '@prisma/client';
 import { CloudinaryService } from '@project/lib/cloudinary/cloudinary.service';
+import { successResponse } from '@project/common/utils/response.util';
 
 @Injectable()
 export class CreatePostService {
@@ -25,70 +26,64 @@ export class CreatePostService {
     audio?: Express.Multer.File,
     writerId?: string,
   ): Promise<Post> {
-    // Destructure writerId separately to use with Prisma's connect syntax
     const { seriesId, seriesname, categoryIds, ...postData } = createPostDto;
 
-    // Use a Prisma transaction to ensure atomicity for creating the series and the post.
-    return this.prisma.$transaction(async (tx) => {
-      let postSeriesId: string | undefined;
-      let nextPartNumber: number | undefined;
+    let postSeriesId: string | undefined;
+    let nextPartNumber: number | undefined;
 
-      // Logic to handle series creation or linking to an existing one
+    // First, create the post and related entities inside a transaction
+    const createdPost = await this.prisma.$transaction(async (tx) => {
+      // Handle series creation or connection
       if (seriesname) {
         if (seriesId) {
           throw new BadRequestException(
             'Cannot provide both a new seriesName and an existing seriesId.',
           );
         }
-        // Create a new series and get its ID
         const newSeries: Series = await tx.series.create({
-          data: {
-            name: seriesname,
-          },
+          data: { name: seriesname },
         });
         postSeriesId = newSeries.id;
-        nextPartNumber = 1; // The first post in a new series is always part 1.
+        nextPartNumber = 1;
       } else if (seriesId) {
-        // If an existing seriesId is provided, find the next available part number.
         const lastPostInSeries = await tx.post.findFirst({
-          where: { seriesId: seriesId },
+          where: { seriesId },
           orderBy: { part: 'desc' },
         });
-
-        // The part number is the last part + 1, or 1 if it's the first post.
         nextPartNumber = (lastPostInSeries?.part ?? 0) + 1;
-
         postSeriesId = seriesId;
       }
 
-      // Connect to categories for the many-to-many relationship
       const categoriesToConnect = categoryIds.map((id) => ({ id }));
 
-      // Create the post with the appropriate series connection and part number.
-      const createdPost = await tx.post.create({
+      return await tx.post.create({
         data: {
           ...postData,
           thumbnail,
-          writer: {
-            connect: {
-              id: writerId,
-            },
-          },
+          writer: { connect: { id: writerId } },
           series: postSeriesId ? { connect: { id: postSeriesId } } : undefined,
           categories: { connect: categoriesToConnect },
           part: nextPartNumber,
         },
       });
-      if (audio) {
+    });
+
+    // ✅ Now outside the transaction — post is committed, postId is safe to use
+    if (audio) {
+      try {
         await this.cloudinaryService.processUploadedAudio(
           audio,
           createdPost.id,
           postSeriesId,
           nextPartNumber,
         );
+      } catch (error) {
+        console.error('Error processing uploaded audio:', error);
+        // Optionally: delete the post if audio upload fails?
+        throw new BadRequestException('Failed to upload audio file');
       }
+    }
 
-      return createdPost;
-    });
+    return createdPost;
   }
 }
