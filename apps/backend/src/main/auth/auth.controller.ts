@@ -57,27 +57,25 @@ export class AuthController {
     );
   }
 
-
   // User login
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     return await this.authService.login(loginDto);
-  }  
-
-  // Google Login 
-  @Post('google/login')
-  async handleGoogleCode(@Body() code: GoogleLoginDto) {
-    const { tokens, profile } = await this.authService.exchangeCodeForTokens(code.code);
-
-    const user = {
-      userName: `@${(profile.name)?.toLowerCase()}`,
-      email:profile.email,
-      name:profile.name?.split(" ").join(""),
-      images: profile.picture,
-      role: "USER",
-      password:""
-    }
-    return await this.authService.googleLogin(user)
   }
 
+  // Google Login
+  @Post('google/login')
+  async handleGoogleCode(@Body() code: GoogleLoginDto) {
+    const { profile } = await this.authService.exchangeCodeForTokens(code.code);
+
+    const user = {
+      userName: `@${profile.name?.toLowerCase()}`,
+      email: profile.email,
+      name: profile.name?.split(' ').join(''),
+      images: profile.picture,
+      role: 'USER',
+      password: '',
+    };
+    return await this.authService.googleLogin(user);
+  }
 }

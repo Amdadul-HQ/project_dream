@@ -42,7 +42,7 @@ export class AuthService {
       }
 
       // 2️⃣ Check if user already exists
-      const existingUser = await this.prisma.user.findFirstOrThrow({
+      const existingUser = await this.prisma.user.findFirst({
         where: { email: dto.email },
       });
       if (existingUser) {
@@ -155,9 +155,9 @@ export class AuthService {
   }
 
   async exchangeCodeForTokens(code: string): Promise<{
-  tokens: Credentials;
-  profile: oauth2_v2.Schema$Userinfo;
-}> {
+    tokens: Credentials;
+    profile: oauth2_v2.Schema$Userinfo;
+  }> {
     const { tokens } = await this.oauth2Client.getToken(code);
     this.oauth2Client.setCredentials(tokens);
 
@@ -170,40 +170,37 @@ export class AuthService {
     };
   }
 
+  async googleLogin(profile: any): Promise<{ accessToken: string; user: any }> {
+    try {
+      console.log('🔍 googleLogin input profile:', profile);
 
-  async googleLogin(profile: any): Promise<{ accessToken: string,user:any }> {
-  try {
-    console.log('🔍 googleLogin input profile:', profile);
-
-    const existingUser = await this.prisma.user.findFirst({
-      where: { email: profile.email },
-    });
-
-    if(existingUser){
-      throw new BadRequestException('User Already Exist!!!')
-    }
-    let user;
-
-    if (!existingUser) {
-      user = await this.prisma.user.create({
-        data: profile,
+      const existingUser = await this.prisma.user.findFirst({
+        where: { email: profile.email },
       });
-      console.log('Created new user:', user);
-    }
 
-   const payload = {
+      if (existingUser) {
+        throw new BadRequestException('User Already Exist!!!');
+      }
+      let user;
+
+      if (!existingUser) {
+        user = await this.prisma.user.create({
+          data: profile,
+        });
+        console.log('Created new user:', user);
+      }
+
+      const payload = {
         email: user.email,
         roles: user.role,
         sub: user.id,
-};
+      };
 
-    const accessToken = await this.libUtils.generateToken(payload);
-    return { accessToken,user };
-  } catch (error) {
-    console.error(' Error in googleLogin:', error);
-    throw error;
+      const accessToken = await this.libUtils.generateToken(payload);
+      return { accessToken, user };
+    } catch (error) {
+      console.error(' Error in googleLogin:', error);
+      throw error;
+    }
   }
-}
-
-
 }
