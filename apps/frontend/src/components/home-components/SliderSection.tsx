@@ -67,7 +67,7 @@ export const SliderSection = () => {
         {/* Slider Container */}
         <div 
           ref={sliderRef}
-          className="flex gap-2 sm:gap-4 transition-transform duration-500 ease-in-out"
+          className="flex gap-2 sm:gap-6 transition-transform duration-500 ease-in-out"
           style={{
             transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`
           }}
