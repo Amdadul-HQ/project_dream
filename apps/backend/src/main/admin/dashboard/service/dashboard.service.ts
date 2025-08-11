@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DashboardStatsDto } from '../dto/dashboardStats.dto';
 import { PrismaService } from '@project/lib/prisma/prisma.service';
+import { successResponse } from '@project/common/utils/response.util';
 
 @Injectable()
 export class DashboardService {
@@ -119,7 +120,7 @@ export class DashboardService {
       throw new NotFoundException(`Post with ID ${postId} not found.`);
     }
 
-    return post;
+    return successResponse(post, 'Post Details Fetched successfull');
   }
 
   async getUserDetails(userId: string) {
@@ -150,6 +151,6 @@ export class DashboardService {
       throw new NotFoundException(`User with ID ${userId} not found.`);
     }
 
-    return user;
+    return successResponse(user, 'User Details Fetched Successfull');
   }
 }
