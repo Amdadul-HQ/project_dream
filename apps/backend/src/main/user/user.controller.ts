@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser, ValidateAuth } from '@project/common/jwt/jwt.decorator';
 import { LikeService } from './service/like.service';
@@ -8,20 +16,23 @@ import { CreateCommentDto } from './dto/createComment.dto';
 import { CreateFollowDto } from './dto/createFollowee.dto';
 import { CreateReportDto } from './dto/createReport.dto';
 import { ReportService } from './service/report.service';
+import { PostFeedQueryDto } from './dto/postFeedQuery.dto';
+import { PostsService } from './service/posts.service';
 
 @ApiTags('User ---')
 @Controller('user/post')
-@ApiBearerAuth()
-@ValidateAuth()
 export class UserController {
   constructor(
     private readonly likeService: LikeService,
     private readonly commentService: CommentService,
     private readonly followService: FollowService,
     private readonly reportService: ReportService,
+    private readonly postService: PostsService,
   ) {}
 
   @ApiTags('User Like Post---')
+  @ApiBearerAuth()
+  @ValidateAuth()
   @Post('like/:postId')
   @ApiOperation({ summary: 'Post A Like' })
   async postLike(
@@ -33,6 +44,8 @@ export class UserController {
 
   // Unlike a post
   @ApiTags('User Like Post---')
+  @ApiBearerAuth()
+  @ValidateAuth()
   @Delete('unlike/:postId')
   @ApiOperation({ summary: 'Unlike a post' })
   async unlikePost(
@@ -44,6 +57,8 @@ export class UserController {
 
   // Post Comment
   @ApiTags('User Comment Post---')
+  @ApiBearerAuth()
+  @ValidateAuth()
   @Post()
   @ApiOperation({ summary: 'Create a new comment on a post' })
   async createComment(
@@ -54,6 +69,8 @@ export class UserController {
   }
 
   @ApiTags('User Comment Post---')
+  @ApiBearerAuth()
+  @ValidateAuth()
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a comment' })
   // @UseGuards(AuthGuard('jwt'))
@@ -66,6 +83,8 @@ export class UserController {
 
   //   User Follow
   @ApiTags('User Follow Writer---')
+  @ApiBearerAuth()
+  @ValidateAuth()
   @Post('follow')
   @ApiOperation({ summary: 'Follow a user' })
   async followUser(
@@ -78,6 +97,8 @@ export class UserController {
     );
   }
   @ApiTags('User Follow Writer---')
+  @ApiBearerAuth()
+  @ValidateAuth()
   @Delete('unfollow/:followeeId')
   @ApiOperation({ summary: 'Unfollow a user' })
   async unfollowUser(
@@ -88,6 +109,8 @@ export class UserController {
   }
 
   @ApiTags('User Report Post---')
+  @ApiBearerAuth()
+  @ValidateAuth()
   @Post('report')
   @ApiOperation({ summary: 'Report a post' })
   async reportPost(
@@ -95,5 +118,22 @@ export class UserController {
     @GetUser('userId') userId: string,
   ) {
     return await this.reportService.reportPost(createReportDto, userId);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get a feed of posts with pagination' })
+  // @UseGuards(AuthGuard('jwt')) // A guard to get user info, but allow unauthenticated access
+  async getPostsFeed(
+    @Query() query: PostFeedQueryDto,
+    @GetUser('userId') userId?: string,
+  ) {
+    // In a real application, userId would be extracted from a JWT token.
+    return this.postService.getPostsFeed(query, userId);
+  }
+
+  @Get(':postId')
+  @ApiOperation({ summary: 'Get a single post and increment its view count' })
+  async getPostWithViewIncrement(@Param('postId') postId: string) {
+    return this.postService.getPostWithViewIncrement(postId);
   }
 }
