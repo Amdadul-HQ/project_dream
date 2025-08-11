@@ -3,9 +3,10 @@ import { UserController } from './user.controller';
 import { LikeService } from './service/like.service';
 import { CommentService } from './service/comment.service';
 import { FollowService } from './service/follow.service';
+import { ReportService } from './service/report.service';
 
 @Module({
   controllers: [UserController],
-  providers: [LikeService, CommentService, FollowService],
+  providers: [LikeService, CommentService, FollowService, ReportService],
 })
 export class UserModule {}

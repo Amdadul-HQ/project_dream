@@ -6,6 +6,8 @@ import { CommentService } from './service/comment.service';
 import { FollowService } from './service/follow.service';
 import { CreateCommentDto } from './dto/createComment.dto';
 import { CreateFollowDto } from './dto/createFollowee.dto';
+import { CreateReportDto } from './dto/createReport.dto';
+import { ReportService } from './service/report.service';
 
 @ApiTags('User ---')
 @Controller('user/post')
@@ -16,6 +18,7 @@ export class UserController {
     private readonly likeService: LikeService,
     private readonly commentService: CommentService,
     private readonly followService: FollowService,
+    private readonly reportService: ReportService,
   ) {}
 
   @ApiTags('User Like Post---')
@@ -54,8 +57,10 @@ export class UserController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a comment' })
   // @UseGuards(AuthGuard('jwt'))
-  async deleteComment(@Param('id') id: string) {
-    const userId = 'some-authenticated-user-id';
+  async deleteComment(
+    @Param('id') id: string,
+    @GetUser('userId') userId: string,
+  ) {
     return this.commentService.deleteComment(id, userId);
   }
 
@@ -63,9 +68,10 @@ export class UserController {
   @ApiTags('User Follow Writer---')
   @Post('follow')
   @ApiOperation({ summary: 'Follow a user' })
-  // @UseGuards(AuthGuard('jwt'))
-  async followUser(@Body() createFollowDto: CreateFollowDto) {
-    const followerId = 'some-authenticated-user-id';
+  async followUser(
+    @Body() createFollowDto: CreateFollowDto,
+    @GetUser('userId') followerId: string,
+  ) {
     return this.followService.followUser(
       followerId,
       createFollowDto.followeeId,
@@ -74,9 +80,19 @@ export class UserController {
   @ApiTags('User Follow Writer---')
   @Delete('unfollow/:followeeId')
   @ApiOperation({ summary: 'Unfollow a user' })
-  // @UseGuards(AuthGuard('jwt'))
-  async unfollowUser(@Param('followeeId') followeeId: string) {
-    const followerId = 'some-authenticated-user-id';
+  async unfollowUser(
+    @Param('followeeId') followeeId: string,
+    @GetUser('userId') followerId: string,
+  ) {
     return this.followService.unfollowUser(followerId, followeeId);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Report a post' })
+  async reportPost(
+    @Body() createReportDto: CreateReportDto,
+    @GetUser('userId') userId: string,
+  ) {
+    return await this.reportService.reportPost(createReportDto, userId);
   }
 }
