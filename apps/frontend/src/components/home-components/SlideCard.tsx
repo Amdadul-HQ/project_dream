@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface SliderCardProps {
     item: {
       title: string;
@@ -19,9 +21,11 @@ const SliderCard = ({ item, isActive = false }: SliderCardProps) => {
     return (
       <div className={`relative overflow-hidden rounded-xl transition-all duration-300 `}>
         <div className="relative h-52 lg:h-56 rounded-xl">
-          <img
+          <Image
             src={item.image.src}
             alt={item.title}
+            width={500}
+            height={300}
             className=" h-full object-cover rounded-xl"
           />
           <div className="absolute bottom-0 left-0 right-0 p-4 text-white bg-black/50 backdrop-blur-xs">

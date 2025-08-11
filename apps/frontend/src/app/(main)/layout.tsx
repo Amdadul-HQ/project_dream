@@ -6,7 +6,7 @@ export default function MainLayout({
 }>) {
   return (
     <>
-      <div>
+      <div className="bg-hover">
         {children}
       </div>
 
