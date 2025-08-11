@@ -128,12 +128,12 @@ export class UserController {
     @GetUser('userId') userId?: string,
   ) {
     // In a real application, userId would be extracted from a JWT token.
-    return this.postService.getPostsFeed(query, userId);
+    return await this.postService.getPostsFeed(query, userId);
   }
 
   @Get(':postId')
   @ApiOperation({ summary: 'Get a single post and increment its view count' })
   async getPostWithViewIncrement(@Param('postId') postId: string) {
-    return this.postService.getPostWithViewIncrement(postId);
+    return await this.postService.getPostWithViewIncrement(postId);
   }
 }
