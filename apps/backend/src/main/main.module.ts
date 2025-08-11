@@ -5,6 +5,7 @@ import { PostCategoryModule } from './admin/post-category/post-category.module';
 import { PostModule } from './admin/post/post.module';
 import { UserModule } from './user/user.module';
 import { DashboardModule } from './admin/dashboard/dashboard.module';
+import { PrivateChatModule } from './private-chat/private-chat.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { DashboardModule } from './admin/dashboard/dashboard.module';
     PostModule,
     UserModule,
     DashboardModule,
+    PrivateChatModule,
   ],
   controllers: [],
   providers: [],
