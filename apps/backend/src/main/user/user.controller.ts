@@ -87,7 +87,8 @@ export class UserController {
     return this.followService.unfollowUser(followerId, followeeId);
   }
 
-  @Post()
+  @ApiTags('User Report Post---')
+  @Post('report')
   @ApiOperation({ summary: 'Report a post' })
   async reportPost(
     @Body() createReportDto: CreateReportDto,

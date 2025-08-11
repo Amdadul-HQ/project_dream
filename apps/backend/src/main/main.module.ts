@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { PostCategoryModule } from './admin/post-category/post-category.module';
 import { PostModule } from './admin/post/post.module';
 import { UserModule } from './user/user.module';
+import { DashboardModule } from './admin/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { UserModule } from './user/user.module';
     PostCategoryModule,
     PostModule,
     UserModule,
+    DashboardModule,
   ],
   controllers: [],
   providers: [],

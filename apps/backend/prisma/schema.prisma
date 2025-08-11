@@ -37,7 +37,7 @@ model User {
   updatedAt       DateTime         @updatedAt
 
 
-  report          Report[] @relation("Reporter")
+  report        Report[] @relation("Reporter")
 }
 
 // auth module
@@ -123,6 +123,7 @@ model Post {
   content       Json
   likeCount     Int              @default(0)
   commentCount  Int              @default(0)
+  viewsCount    Int              @default(0)
 
   like          User[]
   comments      Comment[]
