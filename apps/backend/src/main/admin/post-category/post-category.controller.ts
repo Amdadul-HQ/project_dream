@@ -5,12 +5,11 @@ import { PostCategoryService } from './service/post-category.service';
 import { CreatePostCategoryDto } from './dto/createPostCategory.dto';
 
 @ApiTags('Admin Post Category ---')
-@Controller('admin/post-category')
-@ApiBearerAuth()
-@ValidateAdmin()
+@Controller('post-category')
 export class PostCategoryController {
   constructor(private readonly postCategoryService: PostCategoryService) {}
-
+  @ApiBearerAuth()
+  @ValidateAdmin()
   @Post()
   @ApiOperation({ summary: 'Create a new category' })
   async createCategory(@Body() dto: CreatePostCategoryDto) {
