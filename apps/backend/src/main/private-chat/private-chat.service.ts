@@ -53,7 +53,6 @@ export class PrivateChatService {
       },
       include: {
         sender: true,
-        file: true,
       },
     });
 
@@ -90,7 +89,6 @@ export class PrivateChatService {
       where: { conversationId },
       include: {
         sender: true,
-        file: true,
       },
       orderBy: { createdAt: 'asc' },
     });
@@ -105,7 +103,6 @@ export class PrivateChatService {
         messages: {
           take: 1,
           orderBy: { createdAt: 'desc' },
-          include: { file: true },
         },
       },
       orderBy: { updatedAt: 'desc' },
