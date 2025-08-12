@@ -3,6 +3,7 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import Link from "next/link";
+import Logo from "@/components/shared/Logo/Logo";
 
 interface LoginFormData {
   email: string;
@@ -36,8 +37,11 @@ export default function Login() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md mx-2">
+        <div className="flex items-center justify-center">
+          <Logo />
+        </div>
+        <h2 className="text-2xl font-bold text-center mb-6 mt-3 text-slate-900">Login to your account.</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
           <div>
@@ -77,12 +81,12 @@ export default function Login() {
           </div>
 
           {/* Submit */}
-          <button type="submit" className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition">
+          <button type="submit" className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer">
             Login
           </button>
 
           {/* Redirect to Register */}
-          <p className="text-sm text-center mt-2">
+          <p className="text-sm text-center mt-2 font-medium">
             Don’t have an account?{" "}
             <Link href="/register" className="text-[#2F2685] hover:underline">
               Register
@@ -90,10 +94,17 @@ export default function Login() {
           </p>
         </form>
 
+        {/* Divider */}
+        <div className="flex items-center my-4">
+          <div className="flex-1 h-px bg-gray-300"></div>
+          <span className="px-3 text-gray-500 text-sm">or</span>
+          <div className="flex-1 h-px bg-gray-300"></div>
+        </div>
+
         {/* Google Login */}
         <button
           onClick={handleGoogleLogin}
-          className="mt-4 w-full flex items-center justify-center gap-2 border py-2 rounded-md hover:bg-gray-100 transition"
+          className="mt-4 w-full flex items-center justify-center gap-2 border py-2 rounded-md hover:bg-gray-100 transition cursor-pointer"
         >
           <FcGoogle size={22} />
           <span>Login with Google</span>
