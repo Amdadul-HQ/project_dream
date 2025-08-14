@@ -5,13 +5,13 @@ import SliderSection from "@/components/home-components/SliderSection";
 
 export default function Home() {
     return (
-      <div className=" ">
+      <div className="">
        <SliderSection />
        <div className="flex items-start gap-5 px-5">
-        <div className="w-3/4">
+        <div className="lg:w-3/4">
           <PostCollections />
         </div>
-        <div className="w-1/4">
+        <div className="hidden lg:block lg:w-1/4">
           <RightsideLayout />
         </div>
        </div>
