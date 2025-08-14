@@ -11,7 +11,12 @@ const tabs = [
   "Top picks"
 ];
 
-export default function TabComponent() {
+interface TabComponentProps {
+  gridMode: boolean;
+  setGridMode: (mode: boolean) => void;
+}
+
+export default function TabComponent({ gridMode, setGridMode }: TabComponentProps) {
   const [active, setActive] = useState(0);
 
   return (
@@ -37,11 +42,11 @@ export default function TabComponent() {
       
       {/* View toggle buttons */}
       <div className="flex gap-2 shrink-0">
-        <button className="w-7 h-7 sm:w-8 sm:h-8 flex items-center bg-hover justify-center rounded-md border border-gray-200 text-secondary hover:bg-hover transition-colors">
-          <CiGrid2H className="font-semibold text-lg sm:text-xl" />
+        <button className={` ${gridMode ? "bg-white" : "bg-hover"} w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md border border-gray-200 text-secondary hover:bg-hover transition-colors`}>
+          <CiGrid2H onClick={() => setGridMode(false)} className="font-semibold text-lg sm:text-xl" />
         </button>
-        <button className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md border border-gray-200 text-secondary hover:bg-hover transition-colors">
-          <MdCheckBoxOutlineBlank className="font-semibold text-lg sm:text-xl" />
+        <button className={` ${gridMode ? "bg-hover" : "bg-white"} w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md border border-gray-200 text-secondary hover:bg-hover transition-colors`}>
+          <MdCheckBoxOutlineBlank onClick={() => setGridMode(true)} className="font-semibold text-lg sm:text-xl" />
         </button>
       </div>
     </div>

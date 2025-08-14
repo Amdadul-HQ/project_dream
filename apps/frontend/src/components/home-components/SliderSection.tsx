@@ -10,7 +10,6 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Demodata } from "@/assets/Demodata";
-
 import './slider.css';
 
 // import required modules

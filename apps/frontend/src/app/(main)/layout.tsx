@@ -7,12 +7,16 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="max-w-7xl mx-auto">
+    <>
     <Navbar />
+    <div className="max-w-7xl mx-auto">
+    
       <div className="bg-hover">
         {children}
       </div>
-    <Footer />
     </div>
+    <Footer />
+    </>
+    
   );
 }
