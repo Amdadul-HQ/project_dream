@@ -18,7 +18,7 @@ export default function TabComponent() {
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3 sm:py-5">
       {/* Tabs container with horizontal scroll on mobile */}
       <div className="flex gap-2 sm:gap-4 lg:gap-6 overflow-x-auto w-full sm:w-auto scrollbar-hide">
-        <div className="flex gap-2 sm:gap-4 lg:gap-6 min-w-max">
+        <div className="flex flex-wrap md:flex-nowrap gap-2 sm:gap-4 lg:gap-6 md:min-w-max">
           {tabs.map((tab, idx) => (
             <button
               key={tab}
