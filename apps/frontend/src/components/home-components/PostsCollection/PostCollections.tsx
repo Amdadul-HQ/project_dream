@@ -1,19 +1,30 @@
-import React from 'react';
-import { Demodata } from '@/assets/Demodata';
-import PostCard from './PostCard';
-import TabComponent from './TabComponent';
+"use client";
+import React, { useState } from "react";
+import { Demodata } from "@/assets/Demodata";
+import PostCard from "./PostCard";
+import TabComponent from "./TabComponent";
+import GridPostCard from "./GridPostCard";
 
 const PostCollections = () => {
-    return (
-        <div className='bg-white rounded-lg shadow-md'>
-            <TabComponent />
-            <div className='grid grid-cols-1 gap-4 px-5 w-full'>
-            {Demodata.map((item, index) => (
-                <PostCard key={index} item={item} />
-            ))}
-        </div>
-        </div>
-    );
+  const [gridMode, setGridMode] = useState(false);
+  return (
+    <div className="bg-white rounded-lg shadow-md">
+      <TabComponent gridMode={gridMode} setGridMode={setGridMode} />
+      <div
+        className={`grid ${
+          gridMode ? "grid-cols-3 gap-5" : "grid-cols-1 gap-4"
+        } px-5 w-full`}
+      >
+        {Demodata.map((item, index) =>
+          gridMode ? (
+            <GridPostCard key={index} item={item} />
+          ) : (
+            <PostCard key={index} item={item} />
+          )
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default PostCollections;

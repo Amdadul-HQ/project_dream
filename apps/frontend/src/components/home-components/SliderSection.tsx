@@ -1,21 +1,19 @@
+"use client";
 
-'use client'
-
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 // Import Swiper React components
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import { Demodata } from "@/assets/Demodata";
-
-import './slider.css';
+import "./slider.css";
 
 // import required modules
-import { Navigation, Pagination, Mousewheel, Keyboard } from 'swiper/modules';
-import SliderCard from './SlideCard';
+import { Navigation, Pagination, Mousewheel, Keyboard } from "swiper/modules";
+import SliderCard from "./SlideCard";
 
 export default function SliderSection() {
   return (
