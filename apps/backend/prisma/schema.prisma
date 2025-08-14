@@ -36,6 +36,15 @@ model User {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
+
+  report        Report[] @relation("Reporter")
+
+  PrivateMessageStatus PrivateMessageStatus[]
+
+  privateConversation1 PrivateConversation[]     @relation("User1Conversations")
+  privateConversation2 PrivateConversation[]     @relation("User2Conversations")
+
+  privateMessage PrivateMessage[]
 }
 
 // auth module
@@ -121,12 +130,14 @@ model Post {
   content       Json
   likeCount     Int              @default(0)
   commentCount  Int              @default(0)
+  viewsCount    Int              @default(0)
 
   like          User[]
   comments      Comment[]
 
   status        PostStatus       @default(PUBLISHED)
   audio         Audio?
+  reports       Report[]         @relation("ReportedPost")
 
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
@@ -225,5 +236,75 @@ model Audio {
   updatedAt        DateTime    @updatedAt
 }
 
+// New model for reporting posts
+model Report {
+  id            String          @id @default(uuid())
+  postId        String
+  post          Post            @relation("ReportedPost", fields: [postId], references: [id])
+  reporterId    String
+  reporter      User            @relation("Reporter", fields: [reporterId], references: [id])
+  reason        String
+  status        ReportStatus    @default(PENDING)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+
+// Status for a report
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
+}
+
+model PrivateMessage {
+  id             String  @id @default(uuid())
+  content        String
+  conversationId String
+  senderId       String
+  fileId         String?
+
+  // file         FileInstance?       @relation(fields: [fileId], references: [id])
+  conversation PrivateConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User                @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  statuses  PrivateMessageStatus[]
+  createdAt DateTime               @default(now())
+}
+
+model PrivateConversation {
+  id      String @id @default(uuid())
+  user1Id String
+  user2Id String
+
+  user1 User @relation("User1Conversations", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2 User @relation("User2Conversations", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  messages  PrivateMessage[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@unique([user1Id, user2Id]) // prevent duplicates (A-B same as B-A)
+}
+
+model PrivateMessageStatus {
+  id        String                @id @default(uuid())
+  messageId String
+  userId    String
+  status    MessageDeliveryStatus
+  updatedAt DateTime              @updatedAt
+
+  message PrivateMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+}
+
+
+enum MessageDeliveryStatus {
+  SENT
+  DELIVERED
+  READ
+}
 
 

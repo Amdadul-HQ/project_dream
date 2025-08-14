@@ -79,6 +79,9 @@ importers:
       googleapis:
         specifier: ^155.0.0
         version: 155.0.0
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.2
       mime-types:
         specifier: ^3.0.1
         version: 3.0.1
@@ -103,6 +106,9 @@ importers:
       rxjs:
         specifier: ^7.8.1
         version: 7.8.2
+      socket.io:
+        specifier: ^4.8.1
+        version: 4.8.1
       uuid:
         specifier: ^11.1.0
         version: 11.1.0
