@@ -70,6 +70,7 @@
   --text-tertiary: #666C79;
   --text-accent: #2F2685;
   --bg-hover: #F7F7F8;
+  --bg-accent: #2F2685;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -147,7 +148,16 @@
   .text-secondary {
     color: var(--text-secondary) !important;
   }
+  .text-tertiary {
+    color: var(--text-tertiary) !important;
+  }
+  .text-accent {
+    color: var(--text-accent) !important;
+  }
   .bg-hover {
     background-color: var(--bg-hover) !important;
+  }
+  .bg-accent {
+    background-color: var(--bg-accent) !important;
   }
 }
