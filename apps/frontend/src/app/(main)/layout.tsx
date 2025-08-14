@@ -8,15 +8,11 @@ export default function MainLayout({
 }>) {
   return (
     <>
-    <Navbar />
-    <div className="max-w-7xl mx-auto">
-    
-      <div className="bg-hover">
-        {children}
+      <Navbar />
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-hover">{children}</div>
       </div>
-    </div>
-    <Footer />
+      <Footer />
     </>
-    
   );
 }
