@@ -188,6 +188,174 @@
 //   );
 // }
 
+// import {
+//   AlignCenter,
+//   AlignLeft,
+//   AlignRight,
+//   Bold,
+//   Heading1,
+//   Heading2,
+//   Heading3,
+//   Heading4,
+//   Heading5,
+//   Heading6,
+//   Highlighter,
+//   Italic,
+//   List,
+//   ListOrdered,
+//   Strikethrough,
+//   Quote,
+//   Undo,
+//   Redo,
+//   Minus,
+//   Underline,
+// } from "lucide-react";
+// import { BsJustify } from "react-icons/bs";
+
+// import { Editor } from "@tiptap/react";
+// import { Toggle } from "@/components/ui/toggle";
+// import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+// export default function MenuBar({ editor }: { editor: Editor | null }) {
+//   if (!editor) return null;
+
+//   // Helper to check if command is active
+//   const isActive = (type: string, options: any = {}) => editor.isActive(type, options);
+
+//   const options = [
+//     {
+//       icon: <Undo className="size-4" />,
+//       onClick: () => editor.chain().focus().undo().run(),
+//       pressed: false,
+//       disabled: !editor.can().undo(),
+//       tooltip: "Undo",
+//     },
+//     {
+//       icon: <Redo className="size-4" />,
+//       onClick: () => editor.chain().focus().redo().run(),
+//       pressed: false,
+//       disabled: !editor.can().redo(),
+//       tooltip: "Redo",
+//     },
+//     {
+//       icon: <Heading1 className="size-4" />,
+//       onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
+//       pressed: isActive("heading", { level: 1 }),
+//       tooltip: "Heading 1",
+//     },
+//     {
+//       icon: <Heading2 className="size-4" />,
+//       onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
+//       pressed: isActive("heading", { level: 2 }),
+//       tooltip: "Heading 2",
+//     },
+//     {
+//       icon: <Bold className="size-4" />,
+//       onClick: () => editor.chain().focus().toggleBold().run(),
+//       pressed: isActive("bold"),
+//       tooltip: "Bold",
+//     },
+//     {
+//       icon: <Italic className="size-4" />,
+//       onClick: () => editor.chain().focus().toggleItalic().run(),
+//       pressed: isActive("italic"),
+//       tooltip: "Italic",
+//     },
+//     {
+//       icon: <Underline className="size-4" />,
+//       onClick: () => editor.chain().focus().toggleUnderline().run(),
+//       pressed: isActive("underline"),
+//       tooltip: "Underline",
+//     },
+//     {
+//       icon: <Strikethrough className="size-4" />,
+//       onClick: () => editor.chain().focus().toggleStrike().run(),
+//       pressed: isActive("strike"),
+//       tooltip: "Strikethrough",
+//     },
+//     {
+//       icon: <Quote className="size-4" />,
+//       onClick: () => editor.chain().focus().toggleBlockquote().run(),
+//       pressed: isActive("blockquote"),
+//       tooltip: "Blockquote",
+//     },
+//     {
+//       icon: <Highlighter className="size-4" />,
+//       onClick: () => editor.chain().focus().toggleHighlight().run(),
+//       pressed: isActive("highlight"),
+//       tooltip: "Highlight",
+//     },
+//     {
+//       icon: <AlignLeft className="size-4" />,
+//       onClick: () => editor.chain().focus().setTextAlign("left").run(),
+//       pressed: editor.isActive({ textAlign: "left" }),
+//       tooltip: "Align Left",
+//     },
+//     {
+//       icon: <AlignCenter className="size-4" />,
+//       onClick: () => editor.chain().focus().setTextAlign("center").run(),
+//       pressed: editor.isActive({ textAlign: "center" }),
+//       tooltip: "Align Center",
+//     },
+//     {
+//       icon: <AlignRight className="size-4" />,
+//       onClick: () => editor.chain().focus().setTextAlign("right").run(),
+//       pressed: editor.isActive({ textAlign: "right" }),
+//       tooltip: "Align Right",
+//     },
+//     {
+//       icon: <BsJustify className="size-4" />,
+//       onClick: () => editor.chain().focus().setTextAlign("justify").run(),
+//       pressed: editor.isActive({ textAlign: "justify" }),
+//       tooltip: "Justify",
+//     },
+//     {
+//       icon: <List className="size-4" />,
+//       onClick: () => editor.chain().focus().toggleBulletList().run(),
+//       pressed: isActive("bulletList"),
+//       tooltip: "Bullet List",
+//     },
+//     {
+//       icon: <ListOrdered className="size-4" />,
+//       onClick: () => editor.chain().focus().toggleOrderedList().run(),
+//       pressed: isActive("orderedList"),
+//       tooltip: "Ordered List",
+//     },
+//     {
+//       icon: <Minus className="size-4" />,
+//       onClick: () => editor.chain().focus().setHorizontalRule().run(),
+//       pressed: false,
+//       tooltip: "Horizontal Rule",
+//     },
+//   ];
+
+//   return (
+//     <div className="border rounded-md p-1 mb-1 dark:border-[#1e232e] dark:text-dark-secondary-txt text-light-secondary-txt z-50 flex items-center justify-center flex-wrap sticky top-0 bg-white shadow-sm">
+//       {options.map((option, index) => (
+//         <TooltipProvider key={index}>
+//           <Tooltip>
+//             <TooltipTrigger asChild>
+//               <Toggle
+//                 pressed={option.pressed}
+//                 onPressedChange={option.onClick}
+//                 disabled={option.disabled}
+//                 className={option.pressed ? "bg-blue-500 text-white" : ""} // Add active color here
+//               >
+//                 {option.icon}
+//               </Toggle>
+//             </TooltipTrigger>
+//             <TooltipContent className="bg-white dark:bg-dark-bg-secondary text-light-primary-txt dark:text-dark-primary-txt shadow-sm shadow-primary">
+//               <p>{option.tooltip}</p>
+//             </TooltipContent>
+//           </Tooltip>
+//         </TooltipProvider>
+//       ))}
+//     </div>
+//   );
+// }
+
+"use client";
+
 import {
   AlignCenter,
   AlignLeft,
@@ -215,117 +383,195 @@ import { BsJustify } from "react-icons/bs";
 import { Editor } from "@tiptap/react";
 import { Toggle } from "@/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { JSX, useEffect, useState } from "react";
+
+type MenuOption = {
+  icon: JSX.Element;
+  onClick: () => void;
+  pressed?: boolean;
+  disabled?: boolean;
+  tooltip: string;
+};
 
 export default function MenuBar({ editor }: { editor: Editor | null }) {
+  const [state, setState] = useState<Record<string, boolean>>({
+    heading1: false,
+    heading2: false,
+    heading3: false,
+    heading4: false,
+    heading5: false,
+    heading6: false,
+    bold: false,
+    italic: false,
+    underline: false,
+    strike: false,
+    blockquote: false,
+    highlight: false,
+    alignLeft: false,
+    alignCenter: false,
+    alignRight: false,
+    alignJustify: false,
+    bulletList: false,
+    orderedList: false,
+    canUndo: false,
+    canRedo: false,
+  });
+
+  // Listen for editor changes to update active states
+  useEffect(() => {
+    if (!editor) return;
+
+    const updateState = () => {
+      setState({
+        heading1: editor.isActive("heading", { level: 1 }),
+        heading2: editor.isActive("heading", { level: 2 }),
+        heading3: editor.isActive("heading", { level: 3 }),
+        heading4: editor.isActive("heading", { level: 4 }),
+        heading5: editor.isActive("heading", { level: 5 }),
+        heading6: editor.isActive("heading", { level: 6 }),
+        bold: editor.isActive("bold"),
+        italic: editor.isActive("italic"),
+        underline: editor.isActive("underline"),
+        strike: editor.isActive("strike"),
+        blockquote: editor.isActive("blockquote"),
+        highlight: editor.isActive("highlight"),
+        alignLeft: editor.isActive({ textAlign: "left" }),
+        alignCenter: editor.isActive({ textAlign: "center" }),
+        alignRight: editor.isActive({ textAlign: "right" }),
+        alignJustify: editor.isActive({ textAlign: "justify" }),
+        bulletList: editor.isActive("bulletList"),
+        orderedList: editor.isActive("orderedList"),
+        canUndo: editor.can().undo(),
+        canRedo: editor.can().redo(),
+      });
+    };
+
+    editor.on("selectionUpdate", updateState);
+    editor.on("transaction", updateState);
+    editor.on("update", updateState);
+
+    updateState(); // run once on mount
+
+    return () => {
+      editor.off("selectionUpdate", updateState);
+      editor.off("transaction", updateState);
+      editor.off("update", updateState);
+    };
+  }, [editor]);
+
   if (!editor) return null;
 
-  // Helper to check if command is active
-  const isActive = (type: string, options: any = {}) => editor.isActive(type, options);
-
-  const options = [
+  const options: MenuOption[] = [
     {
       icon: <Undo className="size-4" />,
       onClick: () => editor.chain().focus().undo().run(),
-      pressed: false,
-      disabled: !editor.can().undo(),
+      disabled: !state.canUndo,
       tooltip: "Undo",
     },
     {
       icon: <Redo className="size-4" />,
       onClick: () => editor.chain().focus().redo().run(),
-      pressed: false,
-      disabled: !editor.can().redo(),
+      disabled: !state.canRedo,
       tooltip: "Redo",
     },
     {
       icon: <Heading1 className="size-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
-      pressed: isActive("heading", { level: 1 }),
+      pressed: state.heading1,
       tooltip: "Heading 1",
     },
     {
       icon: <Heading2 className="size-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
-      pressed: isActive("heading", { level: 2 }),
+      pressed: state.heading2,
       tooltip: "Heading 2",
     },
     {
-      icon: <Bold className="size-4" />,
-      onClick: () => editor.chain().focus().toggleBold().run(),
-      pressed: isActive("bold"),
-      tooltip: "Bold",
+      icon: <Heading3 className="size-4" />,
+      onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
+      pressed: state.heading3,
+      tooltip: "Heading 3",
     },
     {
-      icon: <Italic className="size-4" />,
-      onClick: () => editor.chain().focus().toggleItalic().run(),
-      pressed: isActive("italic"),
-      tooltip: "Italic",
+      icon: <Heading4 className="size-4" />,
+      onClick: () => editor.chain().focus().toggleHeading({ level: 4 }).run(),
+      pressed: state.heading4,
+      tooltip: "Heading 4",
     },
+    {
+      icon: <Heading5 className="size-4" />,
+      onClick: () => editor.chain().focus().toggleHeading({ level: 5 }).run(),
+      pressed: state.heading5,
+      tooltip: "Heading 5",
+    },
+    {
+      icon: <Heading6 className="size-4" />,
+      onClick: () => editor.chain().focus().toggleHeading({ level: 6 }).run(),
+      pressed: state.heading6,
+      tooltip: "Heading 6",
+    },
+    { icon: <Bold className="size-4" />, onClick: () => editor.chain().focus().toggleBold().run(), pressed: state.bold, tooltip: "Bold" },
+    { icon: <Italic className="size-4" />, onClick: () => editor.chain().focus().toggleItalic().run(), pressed: state.italic, tooltip: "Italic" },
     {
       icon: <Underline className="size-4" />,
       onClick: () => editor.chain().focus().toggleUnderline().run(),
-      pressed: isActive("underline"),
+      pressed: state.underline,
       tooltip: "Underline",
     },
     {
       icon: <Strikethrough className="size-4" />,
       onClick: () => editor.chain().focus().toggleStrike().run(),
-      pressed: isActive("strike"),
+      pressed: state.strike,
       tooltip: "Strikethrough",
     },
     {
       icon: <Quote className="size-4" />,
       onClick: () => editor.chain().focus().toggleBlockquote().run(),
-      pressed: isActive("blockquote"),
+      pressed: state.blockquote,
       tooltip: "Blockquote",
     },
-    {
-      icon: <Highlighter className="size-4" />,
-      onClick: () => editor.chain().focus().toggleHighlight().run(),
-      pressed: isActive("highlight"),
-      tooltip: "Highlight",
-    },
+    { icon: <Minus className="size-4" />, onClick: () => editor.chain().focus().setHorizontalRule().run(), tooltip: "Horizontal Rule" },
     {
       icon: <AlignLeft className="size-4" />,
       onClick: () => editor.chain().focus().setTextAlign("left").run(),
-      pressed: editor.isActive({ textAlign: "left" }),
+      pressed: state.alignLeft,
       tooltip: "Align Left",
     },
     {
       icon: <AlignCenter className="size-4" />,
       onClick: () => editor.chain().focus().setTextAlign("center").run(),
-      pressed: editor.isActive({ textAlign: "center" }),
+      pressed: state.alignCenter,
       tooltip: "Align Center",
     },
     {
       icon: <AlignRight className="size-4" />,
       onClick: () => editor.chain().focus().setTextAlign("right").run(),
-      pressed: editor.isActive({ textAlign: "right" }),
+      pressed: state.alignRight,
       tooltip: "Align Right",
     },
     {
       icon: <BsJustify className="size-4" />,
       onClick: () => editor.chain().focus().setTextAlign("justify").run(),
-      pressed: editor.isActive({ textAlign: "justify" }),
+      pressed: state.alignJustify,
       tooltip: "Justify",
     },
     {
       icon: <List className="size-4" />,
       onClick: () => editor.chain().focus().toggleBulletList().run(),
-      pressed: isActive("bulletList"),
+      pressed: state.bulletList,
       tooltip: "Bullet List",
     },
     {
       icon: <ListOrdered className="size-4" />,
       onClick: () => editor.chain().focus().toggleOrderedList().run(),
-      pressed: isActive("orderedList"),
+      pressed: state.orderedList,
       tooltip: "Ordered List",
     },
     {
-      icon: <Minus className="size-4" />,
-      onClick: () => editor.chain().focus().setHorizontalRule().run(),
-      pressed: false,
-      tooltip: "Horizontal Rule",
+      icon: <Highlighter className="size-4" />,
+      onClick: () => editor.chain().focus().toggleHighlight().run(),
+      pressed: state.highlight,
+      tooltip: "Highlight",
     },
   ];
 
@@ -339,7 +585,7 @@ export default function MenuBar({ editor }: { editor: Editor | null }) {
                 pressed={option.pressed}
                 onPressedChange={option.onClick}
                 disabled={option.disabled}
-                className={option.pressed ? "bg-blue-500 text-white" : ""} // Add active color here
+                className={option.pressed ? "bg-blue-500 text-white" : ""}
               >
                 {option.icon}
               </Toggle>
