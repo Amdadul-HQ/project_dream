@@ -374,7 +374,7 @@ export default function PostBlog() {
                 </FormControl>
                 {imagePreview && (
                   <div className="mt-2">
-                    <img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded-md border" />
+                    <img src={imagePreview} alt="Preview" className="aspect-auto w-32 object-cover rounded-md border" />
                   </div>
                 )}
                 <FormMessage />

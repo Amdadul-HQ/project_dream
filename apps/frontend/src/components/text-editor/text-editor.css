@@ -57,8 +57,9 @@
   /* Image styles */
   img {
     width: 100%; /* responsive width */
-    max-width: 600px; /* max width on large screens */
-    max-height: 400px; /* maintain aspect ratio */
+    max-width: 60%; /* max width on large screens */
+    max-height: 500px; /* Flexible height */
+    aspect-ratio: auto; /* maintain aspect ratio */
     object-fit: fill; /* cover the container nicely */
     border-radius: 0.5rem;
     margin: 1rem auto;
@@ -68,7 +69,7 @@
   /* Responsive images */
   @media (max-width: 768px) {
     img {
-      max-width: 300px;
+      max-width: 80%;
     }
   }
   @media (max-width: 480px) {

@@ -67,6 +67,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Highlight from "@tiptap/extension-highlight";
 import Image from "@tiptap/extension-image";
 import FileHandler from "@tiptap/extension-file-handler";
+import { number } from "zod";
 
 const useRichTextEditor = (defaultContent: string | null) => {
   // Example upload function (replace with your API logic)
@@ -108,10 +109,16 @@ const useRichTextEditor = (defaultContent: string | null) => {
           onPaste: async (editor, files, pos) => {
             const file = files[0];
             const imageUrl = await uploadImage(file);
-            editor.commands.insertContentAt(pos, {
-              type: "image",
-              attrs: { src: imageUrl },
-            });
+            // Only insert if pos is a valid number or Range
+            if (typeof pos === "number" || (pos && typeof pos === "object")) {
+              editor.commands.insertContentAt(pos, {
+                type: "image",
+                attrs: { src: imageUrl },
+              });
+            } else {
+              // fallback: insert at current selection
+              editor.commands.setImage({ src: imageUrl });
+            }
           },
         }),
       ],
@@ -120,7 +127,7 @@ const useRichTextEditor = (defaultContent: string | null) => {
     content: defaultContent || "",
     editorProps: {
       attributes: {
-        class: "h-screen hide-scrollbar rounded-md p-10 overflow-y-auto border focus:outline-none text-slate-950 shadow-md ",
+        class: "min-h-screen h-auto hide-scrollbar rounded-md p-10 overflow-y-auto border focus:outline-none text-slate-950 shadow-md ",
       },
     },
     immediatelyRender: false,
