@@ -331,7 +331,7 @@ export default function RegisterPage() {
     form.append("profileImage", data.profileImage);
 
     console.log("FormData entries:");
-    for (let pair of form.entries()) {
+    for (const pair of form.entries()) {
       console.log(pair[0], pair[1]);
     }
 

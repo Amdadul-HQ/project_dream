@@ -2,17 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "apps/backend/src/main.ts",
+      "src": "dist/main.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "apps/backend/src/main.ts"
+      "dest": "dist/main.js"
     }
-  ],
-  "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm --filter backend build",
-  "outputDirectory": "dist/apps/backend"
+  ]
 }

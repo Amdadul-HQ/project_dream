@@ -4,13 +4,13 @@ interface SliderCardProps {
     item: {
       title: string;
       writer_name: string;
-      image: any;
+      image: { src: string };
       createdAt: string;
     };
     isActive?: boolean;
   }
 
-const SliderCard = ({ item, isActive = false }: SliderCardProps) => {
+const SliderCard = ({ item }: SliderCardProps) => {
     const formatDate = (dateString: string) => {
       const date = new Date(dateString);
       const day = date.getDate();

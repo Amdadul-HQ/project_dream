@@ -67,7 +67,6 @@ import TextAlign from "@tiptap/extension-text-align";
 import Highlight from "@tiptap/extension-highlight";
 import Image from "@tiptap/extension-image";
 import FileHandler from "@tiptap/extension-file-handler";
-import { number } from "zod";
 
 const useRichTextEditor = (defaultContent: string | null) => {
   // Example upload function (replace with your API logic)
