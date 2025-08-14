@@ -1,27 +1,18 @@
 {
   "version": 2,
-  "scope": "your-vercel-scope-if-needed",
-  "projects": [
-    {
-      "name": "backend",
-      "rootDirectory": "apps/backend"
-    }
-  ],
   "builds": [
     {
-      "src": "apps/backend/dist/main.js",
+      "src": "apps/backend/src/main.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "apps/backend/dist/main.js"
+      "dest": "apps/backend/src/main.ts"
     }
   ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "buildCommand": "cd apps/backend && pnpm install --frozen-lockfile && pnpm build",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD apps/backend"
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm --filter backend build",
+  "outputDirectory": "dist/apps/backend"
 }
