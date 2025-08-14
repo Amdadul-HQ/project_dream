@@ -1,22 +1,19 @@
-'use client'
+"use client";
 import { useState } from "react";
 import { CiGrid2H } from "react-icons/ci";
 import { MdCheckBoxOutlineBlank } from "react-icons/md";
 
-const tabs = [
-  "Recent",
-  "Trending",
-  "Following",
-  "Liked",
-  "Top picks"
-];
+const tabs = ["Recent", "Trending", "Following", "Liked", "Top picks"];
 
 interface TabComponentProps {
   gridMode: boolean;
   setGridMode: (mode: boolean) => void;
 }
 
-export default function TabComponent({ gridMode, setGridMode }: TabComponentProps) {
+export default function TabComponent({
+  gridMode,
+  setGridMode,
+}: TabComponentProps) {
   const [active, setActive] = useState(0);
 
   return (
@@ -29,9 +26,10 @@ export default function TabComponent({ gridMode, setGridMode }: TabComponentProp
               key={tab}
               onClick={() => setActive(idx)}
               className={`px-2 sm:px-3 py-1 text-sm sm:text-base font-medium rounded-lg transition-colors whitespace-nowrap
-                ${active === idx
-                  ? "bg-hover text-tertiary"
-                  : "text-secondary hover:text-tertiary"
+                ${
+                  active === idx
+                    ? "bg-hover text-tertiary"
+                    : "text-secondary hover:text-tertiary"
                 }`}
             >
               {tab}
@@ -39,14 +37,28 @@ export default function TabComponent({ gridMode, setGridMode }: TabComponentProp
           ))}
         </div>
       </div>
-      
+
       {/* View toggle buttons */}
       <div className="flex gap-2 shrink-0">
-        <button className={` ${gridMode ? "bg-white" : "bg-hover"} w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md border border-gray-200 text-secondary hover:bg-hover transition-colors`}>
-          <CiGrid2H onClick={() => setGridMode(false)} className="font-semibold text-lg sm:text-xl" />
+        <button
+          className={` ${
+            gridMode ? "bg-white" : "bg-hover"
+          } w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md border border-gray-200 text-secondary hover:bg-hover transition-colors`}
+        >
+          <CiGrid2H
+            onClick={() => setGridMode(false)}
+            className="font-semibold text-lg sm:text-xl"
+          />
         </button>
-        <button className={` ${gridMode ? "bg-hover" : "bg-white"} w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md border border-gray-200 text-secondary hover:bg-hover transition-colors`}>
-          <MdCheckBoxOutlineBlank onClick={() => setGridMode(true)} className="font-semibold text-lg sm:text-xl" />
+        <button
+          className={` ${
+            gridMode ? "bg-hover" : "bg-white"
+          } w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md border border-gray-200 text-secondary hover:bg-hover transition-colors`}
+        >
+          <MdCheckBoxOutlineBlank
+            onClick={() => setGridMode(true)}
+            className="font-semibold text-lg sm:text-xl"
+          />
         </button>
       </div>
     </div>
