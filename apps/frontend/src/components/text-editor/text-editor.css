@@ -1,0 +1,173 @@
+/* Basic editor styles */
+.tiptap {
+  :first-child {
+    margin-top: 0;
+  }
+
+  /* Heading styles */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 1.1;
+    margin-top: 2.5rem;
+    text-wrap: pretty;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+  }
+  h3 {
+    font-size: 1.4rem;
+  }
+  h4 {
+    font-size: 1.3rem;
+  }
+  h5 {
+    font-size: 1.2rem;
+  }
+  h6 {
+    font-size: 1.1rem;
+  }
+
+  /* List styles */
+  ul {
+    list-style-type: disc;
+  }
+  ol {
+    list-style-type: decimal;
+  }
+  ul,
+  ol {
+    padding: 0 1rem;
+    margin: 1.25rem 1rem 1.25rem 0.4rem;
+  }
+  ul li p,
+  ol li p {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+  }
+
+  /* Image styles */
+  img {
+    width: 100%; /* responsive width */
+    max-width: 60%; /* max width on large screens */
+    max-height: 500px; /* Flexible height */
+    aspect-ratio: auto; /* maintain aspect ratio */
+    object-fit: fill; /* cover the container nicely */
+    border-radius: 0.5rem;
+    margin: 1rem auto;
+    display: block;
+  }
+
+  /* Responsive images */
+  @media (max-width: 768px) {
+    img {
+      max-width: 80%;
+    }
+  }
+  @media (max-width: 480px) {
+    img {
+      max-width: 100%;
+    }
+  }
+
+  /* Code block styling */
+  pre {
+    background: rgb(15, 14, 14);
+    border-radius: 0.5rem;
+    color: white;
+    font-family: "JetBrainsMono", monospace;
+    margin: 1.5rem 0;
+    padding: 0.75rem 1rem;
+  }
+  pre code {
+    background: none;
+    color: inherit;
+    font-size: 0.8rem;
+    padding: 0;
+  }
+  pre .hljs-comment,
+  pre .hljs-quote {
+    color: #616161;
+  }
+  pre .hljs-variable,
+  pre .hljs-template-variable,
+  pre .hljs-attribute,
+  pre .hljs-tag,
+  pre .hljs-regexp,
+  pre .hljs-link,
+  pre .hljs-name,
+  pre .hljs-selector-id,
+  pre .hljs-selector-class {
+    color: #f98181;
+  }
+  pre .hljs-number,
+  pre .hljs-meta,
+  pre .hljs-built_in,
+  pre .hljs-builtin-name,
+  pre .hljs-literal,
+  pre .hljs-type,
+  pre .hljs-params {
+    color: #fbbc88;
+  }
+  pre .hljs-string,
+  pre .hljs-symbol,
+  pre .hljs-bullet {
+    color: #b9f18d;
+  }
+  pre .hljs-title,
+  pre .hljs-section {
+    color: #faf594;
+  }
+  pre .hljs-keyword,
+  pre .hljs-selector-tag {
+    color: #70cff8;
+  }
+  pre .hljs-emphasis {
+    font-style: italic;
+  }
+  pre .hljs-strong {
+    font-weight: 700;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid rgb(190, 186, 186);
+    cursor: pointer;
+    margin: 2rem 0;
+  }
+  hr.ProseMirror-selectednode {
+    border-top: 1px solid var(--purple);
+  }
+
+  blockquote {
+    border-left: 3px solid rgb(190, 186, 186);
+    margin: 1.5rem 0;
+    padding-left: 1rem;
+  }
+}
+
+/* Editor container height and scrolling */
+.editor-height {
+  height: 250px; /* fixed editor height */
+  overflow-y: auto; /* enable vertical scroll */
+}
+
+/* Optional: make editor height responsive */
+@media (max-width: 768px) {
+  .editor-height {
+    height: 200px;
+  }
+}
+@media (max-width: 480px) {
+  .editor-height {
+    height: 150px;
+  }
+}
