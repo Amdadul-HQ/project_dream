@@ -67,10 +67,10 @@
 :root {
   --radius: 0.625rem;
   --text-secondary: #404857;
-  --text-tertiary: #666C79;
-  --text-accent: #2F2685;
-  --bg-hover: #F7F7F8;
-  --bg-accent: #2F2685;
+  --text-tertiary: #666c79;
+  --text-accent: #2f2685;
+  --bg-hover: #f7f7f8;
+  --bg-accent: #2f2685;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
