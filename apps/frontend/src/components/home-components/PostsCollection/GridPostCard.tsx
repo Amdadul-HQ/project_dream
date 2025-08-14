@@ -34,15 +34,15 @@ const GridPostCard = ({ item }: { item: any }) => {
         <div className="w-full space-y-5">
           <div className="space-y-4">
             <div className="space-y-2">
-            <h3 className="font-bold text-xl text-tertiary">{item.title}</h3>
-            <div className="flex items-center gap-5 text-xs">
-              <p>{item.writer_name}</p>
-              <p>{formatDate(item.createdAt)}</p>
+              <h3 className="font-bold text-xl text-tertiary">{item.title}</h3>
+              <div className="flex items-center gap-5 text-xs">
+                <p>{item.writer_name}</p>
+                <p>{formatDate(item.createdAt)}</p>
+              </div>
             </div>
-          </div>
-          <div className="w-full overflow-hidden">
-            <p className="line-clamp-3">{item.content}</p>
-          </div>
+            <div className="w-full overflow-hidden">
+              <p className="line-clamp-3">{item.content}</p>
+            </div>
           </div>
 
           <div className="flex gap-8 justify-between items-center text-sm">
