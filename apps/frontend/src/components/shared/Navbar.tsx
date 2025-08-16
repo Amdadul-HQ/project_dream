@@ -5,23 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import logo from "@/assets/Logo.png";
+import Link from "next/link";
+import Logo from "./Logo/Logo";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("All");
 
-  const navItems = [
-    "All",
-    "Horror",
-    "Islamic",
-    "Science",
-    "Mystery",
-    "Thriller",
-    "Adventure",
-    "Historical",
-    "Biography",
-    "Drama",
-  ];
+  const navItems = ["All", "Horror", "Islamic", "Science", "Mystery", "Thriller", "Adventure", "Historical", "Biography", "Drama"];
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -34,15 +25,10 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="flex items-center">
-              <Image
-                src={logo}
-                alt="Obliq Logo"
-                width={100}
-                height={60}
-                className="w-full min-h-[35px]"
-              />
-            </div>
+            {/* <div className="flex items-center">
+              <Image src={logo} alt="Obliq Logo" width={100} height={60} className="w-full min-h-[35px]" />
+            </div> */}
+            <Logo />
           </div>
 
           {/* Search Bar - Desktop */}
@@ -68,26 +54,25 @@ const Navbar = () => {
 
             {/* Desktop Actions */}
             <div className="hidden sm:flex items-center space-x-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-700 bg-hover hover:text-gray-900"
-              >
-                Log in
-              </Button>
-              <Button
-                size="sm"
-                className="bg-accent hover:bg-indigo-700 text-white px-4 py-2 rounded-md"
-              >
-                Sign up
-              </Button>
-              <Button
-                size="sm"
-                className="bg-accent hover:bg-indigo-700 text-white px-3 py-2 rounded-md flex items-center space-x-1"
-              >
-                <Plus className="h-4 w-4" />
-                <span className="hidden lg:inline">New post</span>
-              </Button>
+              <Link href={"/login"}>
+                <Button variant="ghost" size="sm" className="cursor-pointer text-gray-700 bg-hover hover:text-gray-900">
+                  Log in
+                </Button>
+              </Link>
+              <Link href={"/register"}>
+                <Button size="sm" className="cursor-pointer bg-accent hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+                  Sign up
+                </Button>
+              </Link>
+              <Link href={"/post-blog"}>
+                <Button
+                  size="sm"
+                  className="cursor-pointer bg-accent hover:bg-indigo-700 text-white px-3 py-2 rounded-md flex items-center space-x-1"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden lg:inline">New post</span>
+                </Button>
+              </Link>
             </div>
 
             {/* User Avatar */}
@@ -98,17 +83,8 @@ const Navbar = () => {
             </Button>
 
             {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="md:hidden p-2"
-              onClick={toggleMobileMenu}
-            >
-              {isMobileMenuOpen ? (
-                <X className="h-5 w-5 text-gray-600" />
-              ) : (
-                <Menu className="h-5 w-5 text-gray-600" />
-              )}
+            <Button variant="ghost" size="sm" className="md:hidden p-2" onClick={toggleMobileMenu}>
+              {isMobileMenuOpen ? <X className="h-5 w-5 text-gray-600" /> : <Menu className="h-5 w-5 text-gray-600" />}
             </Button>
           </div>
         </div>
@@ -136,9 +112,7 @@ const Navbar = () => {
                 key={item}
                 onClick={() => setActiveTab(item)}
                 className={`text-sm font-medium transition-colors duration-200 py-2 px-1 border-b-2 ${
-                  activeTab === item
-                    ? "text-white px-3 bg-accent rounded-md"
-                    : "text-tertiary border-transparent hover:border-gray-300"
+                  activeTab === item ? "text-white px-3 bg-accent rounded-md" : "text-tertiary border-transparent hover:border-gray-300"
                 }`}
               >
                 {item}
@@ -157,9 +131,7 @@ const Navbar = () => {
                     setIsMobileMenuOpen(false);
                   }}
                   className={`block w-full text-left px-3 py-2 text-sm font-medium transition-colors duration-200 rounded-md ${
-                    activeTab === item
-                      ? "text-indigo-600 bg-brand"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    activeTab === item ? "text-indigo-600 bg-brand" : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   }`}
                 >
                   {item}
@@ -168,19 +140,20 @@ const Navbar = () => {
 
               {/* Mobile Actions */}
               <div className="pt-4 border-t border-gray-100 space-y-2">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-gray-700 hover:text-gray-900"
-                >
-                  Log in
-                </Button>
-                <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
-                  Sign up
-                </Button>
-                <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center space-x-2">
-                  <Plus className="h-4 w-4" />
-                  <span>New post</span>
-                </Button>
+                <Link href={"/login"}>
+                  <Button variant="ghost" className="cursor-pointer w-full justify-start text-gray-700 hover:text-gray-900">
+                    Log in
+                  </Button>
+                </Link>
+                <Link href={"/register"}>
+                  <Button className="cursor-pointer w-full bg-indigo-600 hover:bg-indigo-700 text-white">Sign up</Button>
+                </Link>
+                <Link href={"/post-blog"}>
+                  <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center space-x-2 cursor-pointer">
+                    <Plus className="h-4 w-4" />
+                    <span>New post</span>
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
