@@ -576,7 +576,7 @@ export default function MenuBar({ editor }: { editor: Editor | null }) {
   ];
 
   return (
-    <div className="border rounded-md p-1 mb-1 dark:border-[#1e232e] dark:text-dark-secondary-txt text-light-secondary-txt z-50 flex items-center justify-center flex-wrap sticky top-0 bg-white shadow-sm">
+    <div className="border rounded-md p-1 mb-1 dark:border-[#1e232e] dark:text-dark-secondary-txt text-light-secondary-txt z-30 flex items-center justify-center gap-2 flex-wrap sticky top-[132px] md:top-32 bg-white shadow-sm">
       {options.map((option, index) => (
         <TooltipProvider key={index}>
           <Tooltip>
@@ -585,7 +585,7 @@ export default function MenuBar({ editor }: { editor: Editor | null }) {
                 pressed={option.pressed}
                 onPressedChange={option.onClick}
                 disabled={option.disabled}
-                className={option.pressed ? "bg-blue-500 text-white" : ""}
+                className={option.pressed ? "bg-slate-100 border border-slate-200 text-black" : ""}
               >
                 {option.icon}
               </Toggle>
