@@ -4,6 +4,7 @@ import React from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { LuHeart } from "react-icons/lu";
 import { TfiCommentAlt } from "react-icons/tfi";
+import demoUserImg from "@/assets/user.jpg";
 
 interface PostItem {
   image: { src: string };
@@ -24,27 +25,30 @@ const PostCard = ({ item }: { item: PostItem }) => {
     return `${day} ${month}`;
   };
   return (
-    <div className="flex flex-col sm:flex-row items-start gap-4 w-full p-4 bg-white text-secondary rounded-md hover:bg-gray-100 transition-colors duration-200 ease-in-out">
-      <div className="w-[250px] h-[152px] rounded-md relative">
-        <Image
-          className="rounded-md"
-          src={item.image.src}
-          alt={item.title}
-          width={250}
-          height={152}
-        />
-        <p className="absolute top-1 left-1  px-2 py-1 rounded-md text-white text-xs capitalize bg-black/50 backdrop-blur-xs max-w-max">
-          {item.content_type}
-        </p>
+    <div className="text-secondary py-2 p-4 rounded-md hover:bg-gray-100 bg-gray-100 transition-colors duration-200 ease-in-out">
+      <div className="flex justify-between">
+      <div className="flex items-center gap-x-2">
+        <div className="">
+        <Image alt="Writer" src={demoUserImg} className="w-[34px] h-[34px] rounded-full "/>
+        </div>
+        <div>
+            <h3 className="font-bold text-sm">{item.writer_name}</h3>
+            <p className="text-xs">{`@${item.writer_name.toLocaleLowerCase().split(" ").join("")}`}</p>
+        </div>
       </div>
+        <div className="flex justify-between items-center h-full py-5">
+          {/* <Bookmark /> */}
+          <BsThreeDotsVertical />
+        </div>
+      </div>
+
+    <div className="flex sm:flex-row items-start ">
       <div className="flex items-start gap-5 w-full h-full">
         <div className="w-full space-y-5">
-          <div className="space-y-2">
+          <div className="space-y-1 space-x-0.5">
             <div className="space-y-1">
-              <h3 className="font-bold text-xl text-tertiary">{item.title}</h3>
+              <h3 className="font-bold sm:text-xl text-lg text-tertiary">{item.title}</h3>
               <div className="flex items-center gap-5 text-xs">
-                <p>{item.writer_name}</p>
-                <p>{formatDate(item.createdAt)}</p>
               </div>
             </div>
             <div className="w-full overflow-hidden">
@@ -63,11 +67,20 @@ const PostCard = ({ item }: { item: PostItem }) => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col justify-between items-center gap-5 h-full py-5">
-          <BsThreeDotsVertical />
-          <Bookmark />
-        </div>
       </div>
+      <div className="w-[250px] h-[152px] rounded-md relative">
+        <Image
+          className="rounded-md"
+          src={item.image.src}
+          alt={item.title}
+          width={250}
+          height={152}
+        />
+        <p className="absolute top-1 left-1  px-2 py-1 rounded-md text-white text-xs capitalize bg-black/50 backdrop-blur-xs max-w-max">
+          {item.content_type}
+        </p>
+      </div>
+    </div>
     </div>
   );
 };
