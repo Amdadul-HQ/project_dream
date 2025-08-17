@@ -47,7 +47,7 @@ const PostCard = ({ item }: { item: PostItem }) => {
         <div className="w-full space-y-5">
           <div className="space-y-1 space-x-0.5">
             <div className="space-y-1">
-              <h3 className="font-bold sm:text-xl text-lg text-tertiary">{item.title}</h3>
+              <h3 className="font-bold sm:text-xl text-lg text-black">{item.title}</h3>
               <div className="flex items-center gap-5 text-xs">
               </div>
             </div>
