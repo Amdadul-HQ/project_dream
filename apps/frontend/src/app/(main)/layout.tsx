@@ -1,4 +1,5 @@
 import Footer from "@/components/shared/Footer";
+import BottomNavbar from "@/components/shared/MobileBottomNav";
 import Navbar from "@/components/shared/Navbar";
 
 export default function MainLayout({
@@ -9,6 +10,7 @@ export default function MainLayout({
   return (
     <>
       <Navbar />
+      <BottomNavbar/>
       <div className="max-w-7xl mx-auto">
         <div className="bg-hover">{children}</div>
       </div>

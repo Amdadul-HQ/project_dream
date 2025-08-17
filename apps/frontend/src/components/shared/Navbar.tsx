@@ -3,8 +3,6 @@ import React, { useState } from "react";
 import { Search, Plus, User, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
-import logo from "@/assets/Logo.png";
 import Link from "next/link";
 import Logo from "./Logo/Logo";
 
@@ -83,15 +81,15 @@ const Navbar = () => {
             </Button>
 
             {/* Mobile Menu Button */}
-            <Button variant="ghost" size="sm" className="md:hidden p-2" onClick={toggleMobileMenu}>
+            {/* <Button variant="ghost" size="sm" className="md:hidden p-2" onClick={toggleMobileMenu}>
               {isMobileMenuOpen ? <X className="h-5 w-5 text-gray-600" /> : <Menu className="h-5 w-5 text-gray-600" />}
-            </Button>
+            </Button> */}
           </div>
         </div>
 
         {/* Mobile Search Bar */}
-        <div className="md:hidden pb-4">
-          <div className="relative">
+        <div className="md:hidden">
+          {/* <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-4 w-4 text-gray-400" />
             </div>
@@ -100,7 +98,7 @@ const Navbar = () => {
               placeholder="Search"
               className="pl-10 pr-4 py-2 w-full bg-gray-50 border-gray-200 rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
-          </div>
+          </div> */}
         </div>
 
         {/* Category Navigation */}

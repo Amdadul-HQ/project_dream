@@ -8,11 +8,11 @@ import GridPostCard from "./GridPostCard";
 const PostCollections = () => {
   const [gridMode, setGridMode] = useState(false);
   return (
-    <div className="bg-white rounded-lg shadow-md">
+    <div className="bg-white rounded-lg shadow-md pb-5">
       <TabComponent gridMode={gridMode} setGridMode={setGridMode} />
       <div
         className={`grid ${
-          gridMode ? "grid-cols-3 gap-5" : "grid-cols-1 gap-4"
+          gridMode ? "sm:grid-cols-3 grid-cols-1 gap-5" : "grid-cols-1 gap-4"
         } px-5 w-full`}
       >
         {Demodata.map((item, index) =>
