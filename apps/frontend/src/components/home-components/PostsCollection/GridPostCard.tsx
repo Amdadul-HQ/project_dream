@@ -1,7 +1,6 @@
-import { Bookmark, Heart } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import Image from "next/image";
 import React from "react";
-import { BiCommentDots } from "react-icons/bi";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { LuHeart } from "react-icons/lu";
 import { TfiCommentAlt } from "react-icons/tfi";

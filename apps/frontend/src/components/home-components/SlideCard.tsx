@@ -10,7 +10,7 @@ interface SliderCardProps {
   isActive?: boolean;
 }
 
-const SliderCard = ({ item, isActive = false }: SliderCardProps) => {
+const SliderCard = ({ item }: SliderCardProps) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const day = date.getDate();

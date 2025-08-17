@@ -228,6 +228,7 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useRichTextEditor from "@/components/text-editor/useRichTextEditor";
 import RichtextEdiror from "@/components/text-editor";
+import Image from "next/image";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -374,7 +375,7 @@ export default function PostBlog() {
                 </FormControl>
                 {imagePreview && (
                   <div className="mt-2">
-                    <img src={imagePreview} alt="Preview" className="aspect-auto w-32 object-cover rounded-md border" />
+                    <Image src={imagePreview} alt="Preview" className="aspect-auto w-32 object-cover rounded-md border" />
                   </div>
                 )}
                 <FormMessage />
