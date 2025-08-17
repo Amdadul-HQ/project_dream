@@ -1,14 +1,10 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import {
-  FaTwitter,
-  FaFacebookF,
-  FaYoutube,
-  FaInstagram,
-  FaPinterestP,
-} from "react-icons/fa";
+import { FaTwitter, FaFacebookF, FaYoutube, FaInstagram, FaPinterestP } from "react-icons/fa";
 import Image from "next/image";
 import logo from "@/assets/Logo.png";
+import Logo from "./Logo/Logo";
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -18,19 +14,19 @@ const Footer = () => {
           {/* Left Section - Logo and Description */}
           <div className="lg:col-span-1">
             <div className="flex items-center mb-6">
-              <Image
+              {/* <Image
                 src={logo}
                 alt="Obliq Logo"
                 width={100}
                 height={60}
                 className="max-w-[150px] min-h-[35px]"
-              />
+              /> */}
+              <Logo />
             </div>
 
             <p className="text-gray-500 text-sm leading-relaxed max-w-sm">
-              Speed Lighter Template is Designed Theme for Giving Enhanced look
-              Various Features are available Which is designed in User friendly
-              to handle by Piki Developers.
+              Speed Lighter Template is Designed Theme for Giving Enhanced look Various Features are available Which is designed in User friendly to
+              handle by Piki Developers.
             </p>
 
             {/* Social Media Icons */}
@@ -79,18 +75,12 @@ const Footer = () => {
               <div>
                 <ul className="space-y-4">
                   <li>
-                    <a
-                      href="#"
-                      className="text-gray-600 hover:text-gray-900 text-sm transition-colors duration-200"
-                    >
+                    <a href="#" className="text-gray-600 hover:text-gray-900 text-sm transition-colors duration-200">
                       Home
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="#"
-                      className="text-gray-600 hover:text-gray-900 text-sm transition-colors duration-200"
-                    >
+                    <a href="#" className="text-gray-600 hover:text-gray-900 text-sm transition-colors duration-200">
                       Profile
                     </a>
                   </li>
@@ -99,18 +89,12 @@ const Footer = () => {
               <div>
                 <ul className="space-y-4">
                   <li>
-                    <a
-                      href="#"
-                      className="text-gray-600 hover:text-gray-900 text-sm transition-colors duration-200"
-                    >
+                    <a href="#" className="text-gray-600 hover:text-gray-900 text-sm transition-colors duration-200">
                       Contact us
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="#"
-                      className="text-gray-600 hover:text-gray-900 text-sm transition-colors duration-200"
-                    >
+                    <a href="#" className="text-gray-600 hover:text-gray-900 text-sm transition-colors duration-200">
                       Privacy policy
                     </a>
                   </li>
@@ -123,22 +107,19 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <div className="bg-gray-100 rounded-lg p-6 shadow-sm border border-gray-100">
               <div className="text-center">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Join now to save
-                </h3>
-                <p className="text-lg font-medium text-gray-900 mb-6">
-                  your reads
-                </p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Join now to save</h3>
+                <p className="text-lg font-medium text-gray-900 mb-6">your reads</p>
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Button
                     variant="ghost"
-                    className="flex-1 bg-hover text-gray-700 hover:text-gray-900 border border-gray-200 hover:bg-gray-50"
+                    className="cursor-pointer flex-1 bg-hover text-gray-700 hover:text-gray-900 border border-gray-200 hover:bg-gray-50 w-full"
                   >
-                    Log in
+                    <Link href={"/login"}>Log in</Link>
                   </Button>
-                  <Button className="flex-1 bg-accent hover:bg-indigo-700 text-white">
-                    Sign up
+
+                  <Button className="cursor-pointer flex-1 bg-accent hover:bg-indigo-700 text-white w-full">
+                    <Link href={"/register"}>Sign up</Link>
                   </Button>
                 </div>
               </div>
@@ -148,9 +129,7 @@ const Footer = () => {
 
         {/* Bottom Copyright */}
         <div className="border-t border-gray-200 mt-12 pt-8">
-          <p className="text-center text-gray-400 text-sm">
-            All right reserved by Obliq 2025
-          </p>
+          <p className="text-center text-gray-400 text-sm">All right reserved by Obliq 2025</p>
         </div>
       </div>
     </footer>
