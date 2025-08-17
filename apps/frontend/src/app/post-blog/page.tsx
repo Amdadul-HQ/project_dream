@@ -467,6 +467,7 @@ import { Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useRichTextEditor from "@/components/text-editor/useRichTextEditor";
 import RichtextEdiror from "@/components/text-editor";
+import Image from "next/image";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import Link from "next/link";
