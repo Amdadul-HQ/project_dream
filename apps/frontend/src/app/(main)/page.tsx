@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="">
       <SliderSection />
-      <div className="flex items-start gap-5 px-5">
+      <div className="flex items-start gap-5 lg:px-5">
         <div className="lg:w-3/4">
           <PostCollections />
         </div>
