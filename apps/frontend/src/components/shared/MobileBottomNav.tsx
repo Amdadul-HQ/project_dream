@@ -2,13 +2,14 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Home, Volume2, MessageCircle, User } from "lucide-react"
+import { Home, Volume2, MessageCircle, User, Sparkles } from "lucide-react"
 
 const navItems = [
-  { id: "home", icon: Home, label: "Home" },
-  { id: "audio", icon: Volume2, label: "Audio" },
-  { id: "chat", icon: MessageCircle, label: "Chat" },
-  { id: "profile", icon: User, label: "Profile" },
+  { id: "home", icon: Home, label: "Home",path: "/" },
+  { id:"for you", icon: Sparkles, label : "For You" , path: "/for-you"},
+  { id: "chat", icon: MessageCircle, label: "Chat", path: "/chat" },
+  { id: "audio", icon: Volume2, label: "Audio", path: "/audio" },
+  { id: "profile", icon: User, label: "Profile", path: "/profile" },
 ]
 
 const BottomNavbar=()=> {
@@ -119,3 +120,4 @@ const BottomNavbar=()=> {
 }
 
 export default BottomNavbar;
+
