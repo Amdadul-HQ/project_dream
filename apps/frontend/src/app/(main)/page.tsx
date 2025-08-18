@@ -2,7 +2,7 @@ import PostCollections from "@/components/home-components/PostsCollection/PostCo
 import RightsideLayout from "@/components/home-components/RighsideLayout/RightsideLayout";
 import SliderSection from "@/components/home-components/SliderSection";
 
-export default function Home() {
+const Home =() => {
   return (
     <div className="">
       <SliderSection />
@@ -17,3 +17,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default Home
