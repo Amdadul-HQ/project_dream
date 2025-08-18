@@ -268,6 +268,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { Upload } from "lucide-react";
 import Link from "next/link";
 import Logo from "@/components/shared/Logo/Logo";
+import Image from "next/image";
 
 // ✅ Zod schema for validation
 const registerSchema = z.object({
@@ -408,7 +409,7 @@ export default function RegisterPage() {
                     if (file) setValue("profileImage", file, { shouldValidate: true });
                   }}
                 />
-                {imagePreview && <img src={imagePreview} alt="Preview" className="w-14 h-14 object-cover rounded-full border shrink-0" />}
+                {imagePreview && <Image src={imagePreview} alt="Preview" className="w-14 h-14 object-cover rounded-full border shrink-0" />}
               </div>
               {errors.profileImage && <p className="text-red-500 text-sm">{errors.profileImage.message}</p>}
             </div>

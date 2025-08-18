@@ -70,7 +70,7 @@ const Chatlist = () => {
             {/* Conversations List */}
             <div className="flex-1 overflow-y-auto">
               {conversations.map((conversation) => (
-                <Link href={`chat/${conversation.id}`}>
+                <Link key={conversation.id} href={`chat/${conversation.id}`}>
                     <div
                   key={conversation.id}
                   className="flex items-center p-4 hover:bg-muted/50 cursor-pointer border-b border-border/50"

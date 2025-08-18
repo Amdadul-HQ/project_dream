@@ -1,4 +1,3 @@
-import { Bookmark } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -7,12 +6,12 @@ import { TfiCommentAlt } from "react-icons/tfi";
 import demoUserImg from "@/assets/user.jpg";
 
 const GridPostCard = ({ item }: { item: any }) => {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleDateString("en-US", { month: "short" });
-    return `${day} ${month}`;
-  };
+  // const formatDate = (dateString: string) => {
+  //   const date = new Date(dateString);
+  //   const day = date.getDate();
+  //   const month = date.toLocaleDateString("en-US", { month: "short" });
+  //   return `${day} ${month}`;
+  // };
   return (
     <div className="text-secondary py-2 p-4 rounded-md justify-between items-start flex flex-col hover:bg-gray-100 bg-gray-100 transition-colors duration-200 ease-in-out">
       <div className="flex w-full justify-between">

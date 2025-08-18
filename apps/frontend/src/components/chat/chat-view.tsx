@@ -6,12 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-interface ChatViewProps {
-  conversationId: string
-//   onBack: () => void
-}
 
-const ChatDetails=({ conversationId }: ChatViewProps) => {
+
+const ChatDetails=() => {
   const [message, setMessage] = useState("")
 
   // Mock messages based on your database schema

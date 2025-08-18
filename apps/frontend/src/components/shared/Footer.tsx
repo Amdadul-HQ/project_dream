@@ -1,8 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { FaTwitter, FaFacebookF, FaYoutube, FaInstagram, FaPinterestP } from "react-icons/fa";
-import Image from "next/image";
-import logo from "@/assets/Logo.png";
 import Logo from "./Logo/Logo";
 import Link from "next/link";
 
