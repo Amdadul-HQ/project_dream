@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Home, Volume2, MessageCircle, User, Sparkles } from "lucide-react"
+import Link from "next/link"
 
 const navItems = [
   { id: "home", icon: Home, label: "Home",path: "/" },
@@ -35,6 +36,7 @@ const BottomNavbar=()=> {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
+              <Link className="flex flex-col items-center" href={item.path}>
               {/* Active background bubble */}
               <AnimatePresence>
                 {isActive && (
@@ -98,6 +100,7 @@ const BottomNavbar=()=> {
                 animate={isActive ? { scale: [1, 1.2, 1] } : {}}
                 transition={{ duration: 0.3 }}
               />
+              </Link>
             </motion.button>
           )
         })}
