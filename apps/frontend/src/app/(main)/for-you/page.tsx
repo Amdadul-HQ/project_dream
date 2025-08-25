@@ -10,7 +10,7 @@ const ForYou = () => {
     const [active, setActive] = useState(0);
     const desktopTabs = ["Recent", "Popular", "Following", "Liked", "Top Rated", "Bookmarked"]
     return (
-        <div className="bg-white rounded-lg shadow-md pb-5">
+        <div className="bg-white rounded-lg shadow-md pb-5 sm:pt-5">
 
             <div className="w-full relative sm:hidden block">
                 <TabComponent
