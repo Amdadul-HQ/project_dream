@@ -11,7 +11,7 @@ export default function MainLayout({
     <>
       <Navbar />
       <BottomNavbar/>
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto sm:pb-10 pb-20">
         <div className="bg-hover">{children}</div>
       </div>
       <Footer />
