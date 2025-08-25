@@ -96,15 +96,15 @@ const AudioPostCard = ({ item }: { item: PostItem }) => {
 
       <div className="flex sm:flex-row items-start ">
         <div className="flex items-start gap-5 w-full h-full">
-          <div className="w-full space-y-5">
+          <div className="w-full space-y-2">
             <div className="space-y-1 space-x-0.5">
               <div className="space-y-1">
                 <h3 className="font-bold sm:text-xl text-lg text-black">{item.title}</h3>
                 <div className="flex items-center gap-5 text-xs"></div>
               </div>
-              <div className="w-full overflow-hidden">
+              {/* <div className="w-full overflow-hidden">
                 <p className="line-clamp-3">{item.content}</p>
-              </div>
+              </div> */}
             </div>
 
             {isAudioPost && item.audio && (
