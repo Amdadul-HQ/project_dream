@@ -155,7 +155,6 @@ pnpm docker:dev
 - **Swagger Docs**: http://localhost/docs
 
 For detailed Docker setup and configuration, see [DOCKER.md](./DOCKER.md).
-
 ## Adding Shared Packages
 
 To add shared packages that can be used by both applications:
