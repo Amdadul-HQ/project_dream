@@ -75,9 +75,11 @@ const Navbar = () => {
 
             {/* User Avatar */}
             <Button variant="ghost" size="sm" className="p-1">
-              <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                <User className="h-4 w-4 text-gray-600" />
-              </div>
+              <Link href={"/profile/overview"}>
+                <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                  <User className="h-4 w-4 text-gray-600" />
+                </div>
+              </Link>
             </Button>
 
             {/* Mobile Menu Button */}
