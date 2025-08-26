@@ -315,7 +315,7 @@ export default function ReportsPage() {
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-3">
-                <h4 className="font-semibold text-primary">Do's</h4>
+                <h4 className="font-semibold text-primary">Do&apos;s</h4>
                 <ul className="space-y-1 text-sm text-muted-foreground">
                   <li>• Provide accurate and well-researched information</li>
                   <li>• Credit sources and respect copyright</li>
@@ -325,7 +325,7 @@ export default function ReportsPage() {
               </div>
 
               <div className="space-y-3">
-                <h4 className="font-semibold text-destructive">Don'ts</h4>
+                <h4 className="font-semibold text-destructive">Don&apos;ts</h4>
                 <ul className="space-y-1 text-sm text-muted-foreground">
                   <li>• Share misleading or false information</li>
                   <li>• Use copyrighted content without permission</li>

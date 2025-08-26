@@ -50,7 +50,7 @@ const conversations = [
 
 
 const Chatlist = () => {
-    const [selectedChat, setSelectedChat] = useState<string | null>(null)
+    const [, setSelectedChat] = useState<string | null>(null)
   return (
     <div className="flex-1 flex flex-col">
             {/* Chat List Header */}

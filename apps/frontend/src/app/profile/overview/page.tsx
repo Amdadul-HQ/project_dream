@@ -216,7 +216,7 @@ export default function OverviewPage() {
               <div className="flex items-center gap-4">
                 <div className="w-2 h-2 bg-accent rounded-full" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Post "AI in Content Creation" got 500+ views</p>
+                  <p className="text-sm font-medium">Post &quot;AI in Content Creation&quot; got 500+ views</p>
                   <p className="text-xs text-muted-foreground">5 days ago</p>
                 </div>
                 <Badge variant="outline">Popular</Badge>
