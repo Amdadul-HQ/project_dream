@@ -2,14 +2,14 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { Users, FileText, AlertTriangle, Music, Shield, Search, BarChart3, Menu, X } from "lucide-react"
-import { Suspense } from "react"
+
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: BarChart3 },

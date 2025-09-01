@@ -1,8 +1,8 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, FileText, AlertTriangle, TrendingUp, Eye, Heart, MessageCircle, Music } from "lucide-react"
 import { mockStats } from "@/lib/admin-data"
+import { Users, FileText, AlertTriangle, TrendingUp, Eye, Heart, MessageCircle, Music } from "lucide-react"
 
 export default function AdminDashboard() {
   return (
