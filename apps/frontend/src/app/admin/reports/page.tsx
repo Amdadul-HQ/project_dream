@@ -263,7 +263,7 @@ export default function ReportsPage() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete Report</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to delete this report for "{report.postTitle}"? This action cannot
+                              Are you sure you want to delete this report for &quot;{report.postTitle}&quot;? This action cannot
                               be undone.
                             </AlertDialogDescription>
                           </AlertDialogHeader>

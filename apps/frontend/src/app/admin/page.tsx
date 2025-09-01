@@ -10,7 +10,7 @@ export default function AdminDashboard() {
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Dashboard Overview</h1>
-        <p className="text-muted-foreground">Monitor your platform's performance and key metrics</p>
+        <p className="text-muted-foreground">Monitor your platform&apos;s performance and key metrics</p>
       </div>
 
       {/* Stats Overview */}
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
             <div className="flex items-center space-x-4">
               <div className="w-2 h-2 bg-secondary rounded-full"></div>
               <div className="flex-1">
-                <p className="text-sm">Post reported: "Advanced React Patterns"</p>
+                <p className="text-sm">Post reported: &quot;Advanced React Patterns&quot;</p>
                 <p className="text-xs text-muted-foreground">15 minutes ago</p>
               </div>
             </div>
