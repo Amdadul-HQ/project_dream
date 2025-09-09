@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Search, Plus} from "lucide-react";
+import { Search, Plus, X, Menu} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -8,11 +8,14 @@ import Logo from "./Logo/Logo";
 import useUser from "@/hooks/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { logout } from "@/services/auth";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState("All");
   const { user, setIsLoading,setUser } = useUser();
+  console.log(user);
 
   const navItems = ["All", "Horror", "Islamic", "Science", "Mystery", "Thriller", "Adventure", "Historical", "Biography", "Drama"];
 
@@ -80,7 +83,7 @@ const Navbar = () => {
               </Link>
               }
               
-              <Link href={"/post-blog"}>
+              <Link href={user ? "/post-blog" : `/login?redirectPath=/post-blog`}>
                 <Button
                   size="sm"
                   className="cursor-pointer bg-accent hover:bg-indigo-700 text-white px-3 py-2 rounded-md flex items-center space-x-1"
@@ -99,7 +102,8 @@ const Navbar = () => {
               }
 
             {/* User Avatar */}
-            <Button variant="ghost" size="sm" className="p-1">
+            {
+              user && <Button variant="ghost" size="sm" className="p-1">
               <Link href={"/profile/overview"}>
                 <Avatar>
                   <AvatarImage src={user?.profile ||"https://github.com/shadcn.png"} className="border-2 rounded-full border-slate-300"/>
@@ -107,11 +111,13 @@ const Navbar = () => {
                 </Avatar>
               </Link>
             </Button>
+            }
+            
 
             {/* Mobile Menu Button */}
-            {/* <Button variant="ghost" size="sm" className="md:hidden p-2" onClick={toggleMobileMenu}>
+            <Button variant="ghost" size="sm" className="md:hidden p-2" onClick={toggleMobileMenu}>
               {isMobileMenuOpen ? <X className="h-5 w-5 text-gray-600" /> : <Menu className="h-5 w-5 text-gray-600" />}
-            </Button> */}
+            </Button>
           </div>
         </div>
 
