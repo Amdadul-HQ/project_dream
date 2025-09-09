@@ -1,12 +1,12 @@
 "use client";
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import Link from "next/link";
 import Logo from "@/components/shared/Logo/Logo";
 import { loginUser } from "@/services/auth";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FaSpinner } from "react-icons/fa";
 import { CloudCog } from "lucide-react";
 import useUser from "@/hooks/useUser";
@@ -20,6 +20,13 @@ export default function Login() {
   const { setIsLoading,setUser } = useUser();
   const [loading,setLoading]=useState(false);
   const router=useRouter();
+  const searchParams = useSearchParams();
+  const [redirect, setRedirect] = useState<string | null>(null);
+  useEffect(() => {
+    if(searchParams){
+      setRedirect(searchParams.get("redirectPath"));
+    }
+  }, [searchParams]);
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -45,7 +52,11 @@ export default function Login() {
         setUser(res?.data?.user);
         toast.success(res?.message);
         setIsLoading(true);
-        router.push("/");
+        if (redirect) {
+          router.push(redirect);
+        } else {
+          router.push("/");
+        }
       } 
     } catch (err: any) {
       console.error(err);
