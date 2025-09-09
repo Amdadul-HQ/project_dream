@@ -1,258 +1,3 @@
-// "use client";
-
-// import React, { useEffect, useState } from "react";
-// import { Input } from "@/components/ui/input";
-// import { Button } from "@/components/ui/button";
-// import { Label } from "@/components/ui/label";
-// import { Card, CardContent } from "@/components/ui/card";
-// import { FcGoogle } from "react-icons/fc";
-// import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-// import { Upload } from "lucide-react";
-// import Link from "next/link";
-// import Logo from "@/components/shared/Logo/Logo";
-
-// export default function RegisterPage() {
-//   // Use state to manage form data and validation errors
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     email: "",
-//     phone: "",
-//     password: "",
-//     profileImage: null as File | null,
-//   });
-//   const [errors, setErrors] = useState({
-//     name: "",
-//     email: "",
-//     phone: "",
-//     password: "",
-//     profileImage: "",
-//   });
-//   const [imagePreview, setImagePreview] = useState<string | null>(null);
-//   const [showPassword, setShowPassword] = useState(false);
-
-//   // Effect to handle image preview whenever the profileImage state changes
-//   useEffect(() => {
-//     if (formData.profileImage) {
-//       const previewURL = URL.createObjectURL(formData.profileImage);
-//       setImagePreview(previewURL);
-//       // Clean up the URL object when the component unmounts or the image changes
-//       return () => URL.revokeObjectURL(previewURL);
-//     } else {
-//       setImagePreview(null);
-//     }
-//   }, [formData.profileImage]);
-
-//   // Handle form input changes
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const { id, value, files } = e.target;
-//     // Reset any validation errors for the changed field
-//     setErrors((prevErrors) => ({ ...prevErrors, [id]: "" }));
-
-//     if (id === "profileImage" && files) {
-//       setFormData((prevData) => ({
-//         ...prevData,
-//         profileImage: files[0] || null,
-//       }));
-//     } else {
-//       setFormData((prevData) => ({ ...prevData, [id]: value }));
-//     }
-//   };
-
-//   // Validate the form and return true if valid
-//   const validateForm = () => {
-//     const newErrors = {
-//       name: "",
-//       email: "",
-//       phone: "",
-//       password: "",
-//       profileImage: "",
-//     };
-//     let isValid = true;
-
-//     // Name validation
-//     if (!formData.name) {
-//       newErrors.name = "Name is required";
-//       isValid = false;
-//     }
-
-//     // Email validation
-//     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-//     if (!formData.email) {
-//       newErrors.email = "Email is required";
-//       isValid = false;
-//     } else if (!emailRegex.test(formData.email)) {
-//       newErrors.email = "Invalid email address";
-//       isValid = false;
-//     }
-
-//     // Phone validation
-//     // const phoneRegex = /^[0-9]{11}$/;
-//     // if (!formData.phone) {
-//     //   newErrors.phone = "Phone is required";
-//     //   isValid = false;
-//     // } else if (!phoneRegex.test(formData.phone)) {
-//     //   newErrors.phone = "Phone must be 11 digits";
-//     //   isValid = false;
-//     // }
-
-//     // Password validation
-//     if (!formData.password) {
-//       newErrors.password = "Password is required";
-//       isValid = false;
-//     } else if (formData.password.length < 6) {
-//       newErrors.password = "Password must be at least 6 characters";
-//       isValid = false;
-//     }
-
-//     // Profile Image validation
-//     if (!formData.profileImage) {
-//       newErrors.profileImage = "Profile image is required";
-//       isValid = false;
-//     }
-
-//     setErrors(newErrors);
-//     return isValid;
-//   };
-
-//   // Handle form submission
-//   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     if (validateForm()) {
-//       const form = new FormData();
-//       form.append("name", formData.name);
-//       form.append("email", formData.email);
-//       form.append("phone", formData.phone);
-//       form.append("password", formData.password);
-//       if (formData.profileImage) {
-//         form.append("profileImage", formData.profileImage);
-//       }
-
-//       console.log("FormData entries:");
-//       // Log the form data to the console
-//       for (let pair of form.entries()) {
-//         console.log(pair[0], pair[1]);
-//       }
-
-//       // Reset the form after successful submission
-//       setFormData({
-//         name: "",
-//         email: "",
-//         phone: "",
-//         password: "",
-//         profileImage: null,
-//       });
-//       setErrors({
-//         name: "",
-//         email: "",
-//         phone: "",
-//         password: "",
-//         profileImage: "",
-//       });
-//     }
-//   };
-
-//   return (
-//     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-//       <Card className="w-full max-w-xl shadow-lg rounded-2xl">
-//         <div>
-//           <div className="flex items-center justify-center">
-//             <Logo />
-//           </div>
-//           <h2 className="text-2xl md:text-3xl font-bold text-center mt-3 text-slate-900">Create your account.</h2>
-//         </div>
-//         <CardContent>
-//           <form onSubmit={onSubmit} className="space-y-4" encType="multipart/form-data">
-//             {/* Name */}
-//             <div>
-//               <Label htmlFor="name">Name</Label>
-//               <Input id="name" type="text" value={formData.name} onChange={handleChange} />
-//               {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-//             </div>
-
-//             {/* Email */}
-//             <div>
-//               <Label htmlFor="email">Email</Label>
-//               <Input id="email" type="email" value={formData.email} onChange={handleChange} />
-//               {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-//             </div>
-
-//             {/* Phone */}
-//             <div>
-//               <Label htmlFor="phone">Phone</Label>
-//               <Input id="phone" type="text" value={formData.phone} onChange={handleChange} />
-//               {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
-//             </div>
-
-//             {/* Password */}
-//             <div>
-//               <Label htmlFor="password">Password</Label>
-//               <div className="relative">
-//                 <Input id="password" type={showPassword ? "text" : "password"} value={formData.password} onChange={handleChange} />
-//                 <button
-//                   type="button"
-//                   className="absolute inset-y-0 right-3 flex items-center text-gray-500"
-//                   onClick={() => setShowPassword((prev) => !prev)}
-//                 >
-//                   {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
-//                 </button>
-//               </div>
-//               {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-//             </div>
-
-//             {/* Profile Image */}
-//             <div>
-//               <Label htmlFor="profileImage">Profile Image</Label>
-//               <div className="flex items-center gap-4">
-//                 <label
-//                   htmlFor="profileImage"
-//                   className="mt-1 w-full px-4 py-2 border rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none flex items-center justify-center gap-1.5 text-sm cursor-pointer"
-//                 >
-//                   <Upload size={16} />
-//                   <span className="font-medium">Choose Image</span>
-//                 </label>
-//                 <Input id="profileImage" type="file" accept="image/*" className="hidden" onChange={handleChange} />
-//                 {imagePreview && <img src={imagePreview} alt="Preview" className="w-14 h-14 object-cover rounded-full border shrink-0" />}
-//               </div>
-//               {errors.profileImage && <p className="text-red-500 text-sm">{errors.profileImage}</p>}
-//             </div>
-
-//             {/* Submit */}
-//             <Button type="submit" className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer">
-//               Register
-//             </Button>
-
-//             {/* Login Redirect */}
-//             <p className="text-sm text-center mt-2 font-medium">
-//               Already have an account?{" "}
-//               <Link href="/login" className="text-[#2F2685] hover:underline">
-//                 Login
-//               </Link>
-//             </p>
-//           </form>
-
-//           {/* Divider */}
-//           <div className="flex items-center my-4">
-//             <div className="flex-1 h-px bg-gray-300"></div>
-//             <span className="px-3 text-gray-500 text-sm">or</span>
-//             <div className="flex-1 h-px bg-gray-300"></div>
-//           </div>
-
-//           {/* Google Login */}
-//           <Button
-//             type="button"
-//             variant="outline"
-//             className="w-full flex items-center justify-center gap-2 cursor-pointer"
-//             onClick={() => console.log("Google Login Clicked")}
-//           >
-//             <FcGoogle size={20} />
-//             Continue with Google
-//           </Button>
-//         </CardContent>
-//       </Card>
-//     </div>
-//   );
-// }
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -265,10 +10,15 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { Upload } from "lucide-react";
+import { CloudCog, Upload } from "lucide-react";
 import Link from "next/link";
 import Logo from "@/components/shared/Logo/Logo";
 import Image from "next/image";
+import avatar from "@/assets/avatar.png";
+import { registerUser } from "@/services/auth";
+import { FaSpinner } from "react-icons/fa";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 // ✅ Zod schema for validation
 const registerSchema = z.object({
@@ -281,12 +31,13 @@ const registerSchema = z.object({
       message: "Phone must be exactly 11 digits",
     }),
   password: z.string().nonempty("Password is required").min(6, "Password must be at least 6 characters"),
-  profileImage: z
-    .instanceof(File, { message: "Profile image is required" })
-    .refine((file) => file.size <= 2 * 1024 * 1024, {
+  profile: z
+    .any()
+    .refine((file) => file instanceof File, { message: "Profile image is required" })
+    .refine((file) => !file || file.size <= 2 * 1024 * 1024, {
       message: "Image must be less than 2MB",
     })
-    .refine((file) => ["image/jpeg", "image/png"].includes(file.type), {
+    .refine((file) => !file || ["image/jpeg", "image/png"].includes(file.type), {
       message: "Only JPG or PNG files are allowed",
     }),
 });
@@ -297,6 +48,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const router =useRouter();
 
   // ✅ React Hook Form setup with Zod
   const {
@@ -304,14 +56,15 @@ export default function RegisterPage() {
     handleSubmit,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitting },
+
     reset,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
 
   // Watch profileImage to show preview
-  const profileImage = watch("profileImage");
+  const profileImage = watch("profile");
   useEffect(() => {
     if (profileImage instanceof File) {
       const previewURL = URL.createObjectURL(profileImage);
@@ -323,17 +76,25 @@ export default function RegisterPage() {
   }, [profileImage]);
 
   // ✅ Form submission
-  const onSubmit = (data: RegisterFormData) => {
+  const onSubmit = async (data: RegisterFormData) => {
     const form = new FormData();
     form.append("name", data.name);
     form.append("email", data.email);
     form.append("phone", data.phone || "");
     form.append("password", data.password);
-    form.append("profileImage", data.profileImage);
+    form.append("profile", data.profile);
 
     console.log("FormData entries:");
-    for (const pair of form.entries()) {
-      console.log(pair[0], pair[1]);
+    try {
+      const res = await registerUser(form);
+      console.log("res========>,",res);
+      if(res?.success){
+        toast.success(res?.message);
+        router.push("/login");
+      }
+    } catch (error) {
+      console.log(error);
+       toast.success("Failed to register user. Try again later !!");
     }
 
     reset();
@@ -348,35 +109,74 @@ export default function RegisterPage() {
             <Logo />
           </div>
           <h2 className="text-2xl md:text-3xl font-bold text-center mt-3 text-slate-900">Create your account.</h2>
+          <div className="flex items-center justify-center mt-5">
+            {/* {imagePreview && ( */}
+            <Image
+              src={imagePreview || avatar.src}
+              alt="Preview"
+              width={50}
+              height={50}
+              className="w-20 h-20 object-cover rounded-full border shrink-0 p-1"
+            />
+            {/* )} */}
+          </div>
         </div>
-        <CardContent>
+        <CardContent className="mt-0">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" encType="multipart/form-data">
             {/* Name */}
             <div>
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" type="text" {...register("name")} />
+              <Label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                Name
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                {...register("name")}
+                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
+              />
               {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
             </div>
 
             {/* Email */}
             <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" {...register("email")} />
+              <Label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                {...register("email")}
+                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
+              />
               {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
             </div>
 
             {/* Phone */}
             <div>
-              <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" type="text" {...register("phone")} />
+              <Label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                Phone
+              </Label>
+              <Input
+                id="phone"
+                type="text"
+                {...register("phone")}
+                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
+              />
               {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
             </div>
 
             {/* Password */}
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </Label>
               <div className="relative">
-                <Input id="password" type={showPassword ? "text" : "password"} {...register("password")} />
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  {...register("password")}
+                  className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
+                />
                 <button
                   type="button"
                   className="absolute inset-y-0 right-3 flex items-center text-gray-500"
@@ -390,7 +190,9 @@ export default function RegisterPage() {
 
             {/* Profile Image */}
             <div>
-              <Label htmlFor="profileImage">Profile Image</Label>
+              <Label htmlFor="profileImage" className="block text-sm font-medium text-gray-700">
+                Profile Image
+              </Label>
               <div className="flex items-center gap-4">
                 <label
                   htmlFor="profileImage"
@@ -406,17 +208,19 @@ export default function RegisterPage() {
                   className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
-                    if (file) setValue("profileImage", file, { shouldValidate: true });
+                    if (file) setValue("profile", file, { shouldValidate: true });
                   }}
                 />
-                {imagePreview && <Image src={imagePreview} alt="Preview" className="w-14 h-14 object-cover rounded-full border shrink-0" />}
               </div>
-              {errors.profileImage && <p className="text-red-500 text-sm">{errors.profileImage.message}</p>}
+              {errors.profile?.message && <p className="text-red-500 text-sm">{String(errors.profile.message)}</p>}
             </div>
 
             {/* Submit */}
-            <Button type="submit" className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer">
-              Register
+            <Button
+              type="submit"
+              className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer flex items-center justify-center"
+            >
+              {isSubmitting ? <FaSpinner className="animate-spin"/> : "Register"}
             </Button>
 
             {/* Login Redirect */}
