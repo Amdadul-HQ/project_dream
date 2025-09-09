@@ -4,6 +4,12 @@ import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import Link from "next/link";
 import Logo from "@/components/shared/Logo/Logo";
+import { loginUser } from "@/services/auth";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { FaSpinner } from "react-icons/fa";
+import { CloudCog } from "lucide-react";
+import useUser from "@/hooks/useUser";
 
 interface LoginFormData {
   email: string;
@@ -11,6 +17,9 @@ interface LoginFormData {
 }
 
 export default function Login() {
+  const { setIsLoading,setUser } = useUser();
+  const [loading,setLoading]=useState(false);
+  const router=useRouter();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -25,9 +34,25 @@ export default function Login() {
     }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async(e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     console.log(formData); // send JSON to API
+    try {
+      const res = await loginUser(formData);
+
+      if (res?.success) {
+        setUser(res?.data?.user);
+        toast.success(res?.message);
+        setIsLoading(true);
+        router.push("/");
+      } 
+    } catch (err: any) {
+      console.error(err);
+      toast.success("Failed to login user. Try again later !!");
+    }finally{
+      setLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -81,8 +106,8 @@ export default function Login() {
           </div>
 
           {/* Submit */}
-          <button type="submit" className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer">
-            Login
+          <button type="submit" className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer flex items-center justify-center">
+            {loading ? <FaSpinner className="animate-spin"/> : "Login"}
           </button>
 
           {/* Redirect to Register */}
