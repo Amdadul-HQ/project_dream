@@ -1,19 +1,35 @@
 "use client";
 import React, { useState } from "react";
-import { Search, Plus, User} from "lucide-react";
+import { Search, Plus, X, Menu} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import Logo from "./Logo/Logo";
+import useUser from "@/hooks/useUser";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { logout } from "@/services/auth";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState("All");
+  const { user, setIsLoading,setUser } = useUser();
+  console.log(user);
 
   const navItems = ["All", "Horror", "Islamic", "Science", "Mystery", "Thriller", "Adventure", "Historical", "Biography", "Drama"];
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleLogOut = () => {
+    logout();
+    setIsLoading(true);
+    setUser(null);
+    // if (protectedRoutes.some((route) => pathname.match(route))) {
+    //   router.push("/");
+    // }
   };
 
   return (
@@ -52,17 +68,22 @@ const Navbar = () => {
 
             {/* Desktop Actions */}
             <div className="hidden sm:flex items-center space-x-3">
-              <Link href={"/login"}>
+              {
+                !user && <Link href={"/login"}>
                 <Button variant="ghost" size="sm" className="cursor-pointer text-gray-700 bg-hover hover:text-gray-900">
                   Log in
                 </Button>
               </Link>
-              <Link href={"/register"}>
+              }
+              {
+                !user && <Link href={"/register"}>
                 <Button size="sm" className="cursor-pointer bg-accent hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
                   Sign up
                 </Button>
               </Link>
-              <Link href={"/post-blog"}>
+              }
+              
+              <Link href={user ? "/post-blog" : `/login?redirectPath=/post-blog`}>
                 <Button
                   size="sm"
                   className="cursor-pointer bg-accent hover:bg-indigo-700 text-white px-3 py-2 rounded-md flex items-center space-x-1"
@@ -73,19 +94,30 @@ const Navbar = () => {
               </Link>
             </div>
 
+            {
+                user && 
+                <Button onClick={handleLogOut} size="sm" className="cursor-pointer bg-accent hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+                  Logout
+                </Button>
+              }
+
             {/* User Avatar */}
-            <Button variant="ghost" size="sm" className="p-1">
+            {
+              user && <Button variant="ghost" size="sm" className="p-1">
               <Link href={"/profile/overview"}>
-                <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-gray-600" />
-                </div>
+                <Avatar>
+                  <AvatarImage src={user?.profile ||"https://github.com/shadcn.png"} className="border-2 rounded-full border-slate-300"/>
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
               </Link>
             </Button>
+            }
+            
 
             {/* Mobile Menu Button */}
-            {/* <Button variant="ghost" size="sm" className="md:hidden p-2" onClick={toggleMobileMenu}>
+            <Button variant="ghost" size="sm" className="md:hidden p-2" onClick={toggleMobileMenu}>
               {isMobileMenuOpen ? <X className="h-5 w-5 text-gray-600" /> : <Menu className="h-5 w-5 text-gray-600" />}
-            </Button> */}
+            </Button>
           </div>
         </div>
 
