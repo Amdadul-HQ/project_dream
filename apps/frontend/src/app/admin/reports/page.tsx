@@ -454,6 +454,7 @@ function ReportDetailDialog({
                 <p className="text-xs text-muted-foreground">{report.createdAt}</p>
               </div>
             </div>
+            
             {report.status !== "PENDING" && (
               <div className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
