@@ -1,6 +1,6 @@
 # Fullstack Monorepo
 
-A monorepo containing a Next.js frontend and Nest.js backend application.
+A monorepo containing a Next.js frontend and Nest.js backend application
 
 ## Structure
 
@@ -155,7 +155,6 @@ pnpm docker:dev
 - **Swagger Docs**: http://localhost/docs
 
 For detailed Docker setup and configuration, see [DOCKER.md](./DOCKER.md).
-
 ## Adding Shared Packages
 
 To add shared packages that can be used by both applications:
