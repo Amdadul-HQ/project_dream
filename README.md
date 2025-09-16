@@ -1,4 +1,4 @@
-# Fullstack Monorepo
+# Fullstack Monorepo.
 
 A monorepo containing a Next.js frontend and Nest.js backend application
 
