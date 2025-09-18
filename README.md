@@ -77,7 +77,7 @@ pnpm backend:start
 
 ## Applications
 
-### Frontend (Next.js)
+### Frontend (Next.js).
 - **Location**: `apps/frontend`
 - **Port**: 3000 (development)
 - **Tech Stack**: Next.js 15, React 19, TypeScript, Tailwind CSS, Shadcn/ui

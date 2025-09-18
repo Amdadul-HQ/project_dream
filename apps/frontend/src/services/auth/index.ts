@@ -82,3 +82,28 @@ export const logout = async () => {
   cookieStore.delete("user");
 };
 
+//Resend Verification mail
+export const sendGoogleLogin = async (data: Record<string, any>) => {
+  const cookieStore = await cookies();
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/google/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+
+    if (result?.success) {
+      // Save token in cookies
+      cookieStore.set("accessToken", result?.data?.token);
+
+      // Save user in cookies
+      cookieStore.set("user", JSON.stringify(result?.data?.user));
+    }
+    return result;
+  } catch (error: any) {
+    return { error: error.message };
+  }
+};

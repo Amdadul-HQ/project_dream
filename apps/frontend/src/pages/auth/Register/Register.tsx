@@ -26,14 +26,17 @@ const registerSchema = z.object({
   email: z.string().nonempty("Email is required").email("Invalid email address"),
   phone: z
     .string()
-    .nonempty("Phone number is required")
+    .optional()
     .refine((val) => !val || /^[0-9]{11}$/.test(val), {
       message: "Phone must be exactly 11 digits",
     }),
   password: z.string().nonempty("Password is required").min(6, "Password must be at least 6 characters"),
   profile: z
     .any()
-    .refine((file) => file instanceof File, { message: "Profile image is required" })
+    .optional()
+    .refine((file) => !file || file instanceof File, {
+      message: "Invalid file format",
+    })
     .refine((file) => !file || file.size <= 2 * 1024 * 1024, {
       message: "Image must be less than 2MB",
     })
@@ -48,7 +51,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const router =useRouter();
+  const router = useRouter();
 
   // ✅ React Hook Form setup with Zod
   const {
@@ -87,14 +90,14 @@ export default function RegisterPage() {
     console.log("FormData entries:");
     try {
       const res = await registerUser(form);
-      console.log("res========>,",res);
-      if(res?.success){
+      console.log("res========>,", res);
+      if (res?.success) {
         toast.success(res?.message);
         router.push("/login");
       }
     } catch (error) {
       console.log(error);
-       toast.success("Failed to register user. Try again later !!");
+      toast.success("Failed to register user. Try again later !!");
     }
 
     reset();
@@ -220,7 +223,7 @@ export default function RegisterPage() {
               type="submit"
               className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer flex items-center justify-center"
             >
-              {isSubmitting ? <FaSpinner className="animate-spin"/> : "Register"}
+              {isSubmitting ? <FaSpinner className="animate-spin" /> : "Register"}
             </Button>
 
             {/* Login Redirect */}
