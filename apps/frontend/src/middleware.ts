@@ -11,18 +11,18 @@ export async function middleware(req: NextRequest) {
   const userRole = userInfo?.role; // Assuming userInfo has a `role` property
 
   // Redirect unauthenticated users away from the dashboard
-  if (pathname.startsWith("/profile") && userRole !== "USER") {  
-      return NextResponse.redirect(new URL("/login", req.url));
+  if (pathname.startsWith("/profile") && userRole !== "USER") {
+    return NextResponse.redirect(new URL("/login", req.url));
   }
   // Restrict access to `/dashboard/admin/*` only to admins
-    if (pathname.startsWith("/admin") && userRole !== "ADMIN") {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
+  if (pathname.startsWith("/admin") && userRole !== "ADMIN") {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
 
   return NextResponse.next();
 }
 
 // Define paths that the middleware should run on
 export const config = {
-  matcher: ["/profile/:path*", "/admin/:path*","/login", "/register"],
+  matcher: ["/profile/:path*", "/admin/:path*", "/login", "/register"],
 };
