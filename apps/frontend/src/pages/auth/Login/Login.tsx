@@ -4,6 +4,12 @@ import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import Link from "next/link";
 import Logo from "@/components/shared/Logo/Logo";
+import { loginUser } from "@/services/auth";
+import { toast } from "sonner";
+import useUser from "@/hooks/useUser";
+import { useRouter } from "next/navigation";
+import { FaSpinner } from "react-icons/fa";
+import GoogleLogin from "../GoogleLogin/GoogleLogin";
 
 interface LoginFormData {
   email: string;
@@ -11,6 +17,9 @@ interface LoginFormData {
 }
 
 export default function Login() {
+  const { setUser, setIsLoading } = useUser();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -25,9 +34,31 @@ export default function Login() {
     }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(formData); // send JSON to API
+    setIsSubmitting(true);
+    try {
+      const res = await loginUser(formData);
+      if (res?.success) {
+        toast.success("Login successful!");
+        setUser(res?.data?.user);
+        setIsLoading(false);
+        if (res?.data?.user?.role === "USER" || res?.data?.user?.role === "WRITER") {
+          router.push(`/profile/overview`);
+        }
+        if (res?.data?.user?.role === "ADMIN") {
+          router.push(`/admin/posts`);
+        }
+      } else {
+        toast.error(res?.message || "Login failed. Please try again later.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong. Please try again in a moment.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -81,8 +112,11 @@ export default function Login() {
           </div>
 
           {/* Submit */}
-          <button type="submit" className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer">
-            Login
+          <button
+            type="submit"
+            className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer flex item-center justify-center"
+          >
+            {isSubmitting ? <FaSpinner className="animate-spin" /> : "Sign In"}
           </button>
 
           {/* Redirect to Register */}
@@ -102,13 +136,14 @@ export default function Login() {
         </div>
 
         {/* Google Login */}
-        <button
+        {/* <button
           onClick={handleGoogleLogin}
           className="mt-4 w-full flex items-center justify-center gap-2 border py-2 rounded-md hover:bg-gray-100 transition cursor-pointer"
         >
           <FcGoogle size={22} />
           <span>Login with Google</span>
-        </button>
+        </button> */}
+        {/* <GoogleLogin /> */}
       </div>
     </div>
   );
