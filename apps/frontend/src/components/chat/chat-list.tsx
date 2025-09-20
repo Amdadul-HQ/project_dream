@@ -1,56 +1,42 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from '../ui/button'
 import { Headphones, Plus, Search } from 'lucide-react'
 import { Input } from '../ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { Badge } from '../ui/badge'
 import Link from 'next/link'
-
-
-const conversations = [
-    {
-      id: "1",
-      user: { name: "Gyllinton", avatar: "/abstract-geometric-shapes.png", status: "online" },
-      lastMessage: "I don't know what you're...",
-      timestamp: "2:44 pm",
-      unread: 3,
-    },
-    {
-      id: "2",
-      user: { name: "Mark", avatar: "/abstract-geometric-shapes.png", status: "offline" },
-      lastMessage: "Why?",
-      timestamp: "9:00 am",
-      unread: 0,
-    },
-    {
-      id: "3",
-      user: { name: "Imogen", avatar: "/diverse-group-collaborating.png", status: "online" },
-      lastMessage: "Kisses! 😘",
-      timestamp: "Friday",
-      unread: 0,
-    },
-    {
-      id: "4",
-      user: { name: "Alice", avatar: "/abstract-geometric-shapes.png", status: "away" },
-      lastMessage: "Okay, I'll tell him",
-      timestamp: "8:34 am",
-      unread: 1,
-    },
-    {
-      id: "5",
-      user: { name: "Cloud", avatar: "/single-cumulus-cloud.png", status: "online" },
-      lastMessage: "Audio",
-      timestamp: "8:31 am",
-      unread: 0,
-      type: "audio",
-    },
-  ]
+import { useChat } from '@/contexts/ChatContext'
 
 
 const Chatlist = () => {
-    const [, setSelectedChat] = useState<string | null>(null)
+    const [searchQuery, setSearchQuery] = useState('')
+    const { 
+      conversations, 
+      setCurrentConversation, 
+      loadConversations, 
+      loading, 
+      error,
+      typingUsers 
+    } = useChat()
+
+    // Load conversations on component mount
+    useEffect(() => {
+      loadConversations()
+    }, [loadConversations])
+
+    // Filter conversations based on search query
+    const filteredConversations = conversations.filter(conversation =>
+      conversation.user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+
+    const handleConversationClick = (conversationId: string) => {
+      setCurrentConversation(conversationId)
+    }
+
+    console.log('Conversations:', conversations)
+
   return (
     <div className="flex-1 flex flex-col">
             {/* Chat List Header */}
@@ -63,18 +49,37 @@ const Chatlist = () => {
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search" className="pl-10 rounded-full bg-muted" />
+                <Input 
+                  placeholder="Search" 
+                  className="pl-10 rounded-full bg-muted" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
             </div>
 
+            {/* Loading State */}
+            {loading && (
+              <div className="flex items-center justify-center p-8">
+                <div className="text-muted-foreground">Loading conversations...</div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <div className="flex items-center justify-center p-8">
+                <div className="text-red-500">Error: {error}</div>
+              </div>
+            )}
+
             {/* Conversations List */}
             <div className="flex-1 overflow-y-auto">
-              {conversations.map((conversation) => (
-                <Link key={conversation.id} href={`chat/${conversation.id}`}>
+              {filteredConversations.map((conversation) => (
+                <Link key={conversation.id} href={`/chat/${conversation.id}`}>
                     <div
                   key={conversation.id}
                   className="flex items-center p-4 hover:bg-muted/50 cursor-pointer border-b border-border/50"
-                  onClick={() => setSelectedChat(conversation.id)}
+                  onClick={() => handleConversationClick(conversation.id)}
                 >
                   <div className="relative">
                     <Avatar className="h-12 w-12">
@@ -98,7 +103,9 @@ const Chatlist = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <p className="text-sm text-muted-foreground truncate">
-                        {conversation.type === "audio" ? (
+                        {typingUsers[conversation.user.id] ? (
+                          <span className="text-blue-500 italic">typing...</span>
+                        ) : conversation.type === "audio" ? (
                           <span className="flex items-center">
                             <Headphones className="h-3 w-3 mr-1" />
                             {conversation.lastMessage}
@@ -117,6 +124,23 @@ const Chatlist = () => {
                 </div>
                 </Link>
               ))}
+              
+              {/* Empty State */}
+              {!loading && !error && filteredConversations.length === 0 && (
+                <div className="flex items-center justify-center p-8">
+                  <div className="text-center">
+                    <p className="text-muted-foreground mb-2">
+                      {searchQuery ? 'No conversations found' : 'No conversations yet'}
+                    </p>
+                    {!searchQuery && (
+                      <Button size="sm" className="rounded-full">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Start a conversation
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
   )

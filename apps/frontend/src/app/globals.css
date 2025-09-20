@@ -66,6 +66,9 @@
 
 :root {
   --radius: 0.625rem;
+  /* Fallback font variables to replace next/font/google imports */
+  --font-geist-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  --font-geist-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Segoe UI Mono", "Helvetica Neue", monospace;
   --text-secondary: #404857;
   --text-tertiary: #666c79;
   --text-accent: #2f2685;

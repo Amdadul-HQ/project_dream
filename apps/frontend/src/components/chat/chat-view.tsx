@@ -1,85 +1,145 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { ArrowLeft, Phone, Video, MoreVertical, Send, Paperclip, Mic, Smile } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useChat } from "@/contexts/ChatContext"
+import { useParams, useRouter } from "next/navigation"
 
 
 
 const ChatDetails=() => {
   const [message, setMessage] = useState("")
+  const [isTyping, setIsTyping] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const router = useRouter()
+  const params = useParams()
+  
+  const {
+    conversations,
+    currentConversation,
+    messages,
+    sendMessage,
+    loadMessages,
+    sendTyping,
+    typingUsers,
+    setCurrentConversation,
+    userId: currentUserId
+  } = useChat()
 
-  // Mock messages based on your database schema
-  const messages = [
-    {
-      id: "1",
-      content: "Hi!",
-      senderId: "2",
-      timestamp: "11:59 am",
-      status: "read",
-    },
-    {
-      id: "2",
-      content: "Hi",
-      senderId: "1",
-      timestamp: "12:56 pm",
-      status: "delivered",
-    },
-    {
-      id: "3",
-      content: "We can meet? I am free",
-      senderId: "2",
-      timestamp: "11:59 pm",
-      status: "read",
-    },
-    {
-      id: "4",
-      content: "Can you write the time and place of the meeting?",
-      senderId: "2",
-      timestamp: "2:41 pm",
-      status: "read",
-    },
-    {
-      id: "5",
-      content: "That's fine",
-      senderId: "1",
-      timestamp: "2:40 pm",
-      status: "sent",
-    },
-    {
-      id: "6",
-      content: "Then at 5 near the tower",
-      senderId: "1",
-      timestamp: "2:41 pm",
-      status: "sent",
-    },
-    {
-      id: "7",
-      content: "Deal!",
-      senderId: "2",
-      timestamp: "2:41 pm",
-      status: "read",
-    },
-    {
-      id: "8",
-      content: "Kisses! 😘",
-      senderId: "2",
-      timestamp: "2:52 pm",
-      status: "read",
-    },
-  ]
+  const conversationId = (params?.id as string) || currentConversation || ""
+  const conversation = conversations.find(c => c.id === conversationId)
+  const conversationMessages = conversationId ? (messages[conversationId] || []) : []
 
-  const currentUser = "1"
-  const otherUser = { name: "Imogen", avatar: "/diverse-group-collaborating.png", status: "online" }
+  // Set current conversation when component mounts
+  useEffect(() => {
+    if (conversationId && conversationId !== currentConversation) {
+      setCurrentConversation(conversationId)
+    }
+  }, [conversationId, currentConversation, setCurrentConversation])
+
+  // Load messages for this conversation
+  useEffect(() => {
+    if (conversationId) {
+      loadMessages(conversationId)
+    }
+  }, [conversationId, loadMessages])
+
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [conversationMessages])
+
+  // Cleanup typing timeout
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  // Handle typing indicators
+  const handleTyping = (value: string) => {
+    setMessage(value)
+    
+    if (conversation && value && !isTyping) {
+      setIsTyping(true)
+      sendTyping(conversation.user.id, true)
+    }
+    
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+    }
+    
+    // Set new timeout to stop typing indicator
+    typingTimeoutRef.current = setTimeout(() => {
+      if (conversation) {
+        setIsTyping(false)
+        sendTyping(conversation.user.id, false)
+      }
+    }, 1000)
+  }
 
   const handleSend = () => {
-    if (message.trim()) {
-      // Handle sending message
-      console.log("[v0] Sending message:", message)
+    if (message.trim() && conversation) {
+      sendMessage(conversation.user.id, message.trim())
       setMessage("")
+      
+      // Stop typing indicator
+      if (isTyping) {
+        setIsTyping(false)
+        sendTyping(conversation.user.id, false)
+      }
+      
+      // Clear timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
     }
+  }
+
+  const handleBack = () => {
+    router.push('/chat')
+  }
+
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp)
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    })
+  }
+
+  const getMessageStatus = (status: string) => {
+    switch (status) {
+      case 'read':
+        return 'bg-blue-400'
+      case 'delivered':
+        return 'bg-gray-400'
+      case 'sent':
+        return 'bg-gray-300'
+      default:
+        return 'bg-gray-300'
+    }
+  }
+
+  if (!conversation) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <p className="text-muted-foreground">Conversation not found</p>
+          <Button onClick={handleBack} className="mt-4">
+            Back to Chats
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -92,12 +152,18 @@ const ChatDetails=() => {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <Avatar className="h-10 w-10">
-          <AvatarImage src={otherUser.avatar || "/placeholder.svg"} />
-          <AvatarFallback>{otherUser.name[0]}</AvatarFallback>
+          <AvatarImage src={conversation.user.avatar || "/placeholder.svg"} />
+          <AvatarFallback>{conversation.user.name[0]}</AvatarFallback>
         </Avatar>
         <div className="ml-3 flex-1">
-          <h2 className="font-medium">{otherUser.name}</h2>
-          <p className="text-xs text-muted-foreground">{otherUser.status}</p>
+          <h2 className="font-medium">{conversation.user.name}</h2>
+          <p className="text-xs text-muted-foreground">
+            {typingUsers[conversation.user.id] ? (
+              <span className="text-blue-500">typing...</span>
+            ) : (
+              conversation.user.status
+            )}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm">
@@ -119,41 +185,31 @@ const ChatDetails=() => {
           <span className="bg-muted px-3 py-1 rounded-full text-xs text-muted-foreground">Tuesday, 15</span>
         </div>
 
-        {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.senderId === currentUser ? "justify-end" : "justify-start"}`}>
+        {conversationMessages.map((msg) => (
+          <div key={msg.id} className={`flex ${msg.senderId === currentUserId ? "justify-end" : "justify-start"}`}>
             <div
               className={`max-w-[80%] px-4 py-2 rounded-2xl ${
-                msg.senderId === currentUser
+                msg.senderId === currentUserId
                   ? "bg-primary text-primary-foreground rounded-br-md"
                   : "bg-muted text-foreground rounded-bl-md"
               }`}
             >
               <p className="text-sm">{msg.content}</p>
               <div className="flex items-center justify-end mt-1 gap-1">
-                <span className="text-xs opacity-70">{msg.timestamp}</span>
-                {msg.senderId === currentUser && (
+                <span className="text-xs opacity-70">{formatTimestamp(msg.timestamp)}</span>
+                {msg.senderId === currentUserId && (
                   <div className="flex">
-                    <div className={`w-1 h-1 rounded-full ${msg.status === "read" ? "bg-blue-400" : "bg-gray-400"}`} />
-                    <div
-                      className={`w-1 h-1 rounded-full ml-0.5 ${
-                        msg.status === "read"
-                          ? "bg-blue-400"
-                          : msg.status === "delivered"
-                            ? "bg-gray-400"
-                            : "bg-gray-300"
-                      }`}
-                    />
+                    <div className={`w-1 h-1 rounded-full ${getMessageStatus(msg.status)}`} />
+                    <div className={`w-1 h-1 rounded-full ml-0.5 ${getMessageStatus(msg.status)}`} />
                   </div>
                 )}
               </div>
             </div>
           </div>
         ))}
-
-        {/* Another Date Separator */}
-        <div className="flex justify-center">
-          <span className="bg-muted px-3 py-1 rounded-full text-xs text-muted-foreground">Friday, 18</span>
-        </div>
+        
+        {/* Scroll anchor */}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Message Input */}
@@ -165,7 +221,7 @@ const ChatDetails=() => {
           <div className="flex-1 relative">
             <Input
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => handleTyping(e.target.value)}
               placeholder="Hi! How do you?"
               className="pr-10 rounded-full"
               onKeyPress={(e) => e.key === "Enter" && handleSend()}

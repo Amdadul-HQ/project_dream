@@ -2,7 +2,9 @@ import ChatDetails from "@/components/chat/chat-view";
 
 const ChatView = () => {
   return (
-    <ChatDetails/>
+    <div className="flex-1">
+      <ChatDetails/>
+    </div>
   )
 }
 
