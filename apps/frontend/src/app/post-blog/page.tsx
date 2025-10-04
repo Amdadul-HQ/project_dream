@@ -1,6 +1,6 @@
 "use client";
 
-import PostBlog from "@/pages/PostBlog/PostBlog";
+import PostBlog from "@/components/blog/PostBlog/PostBlog";
 import { getAllCategories } from "@/services/categories";
 import { useEffect, useState } from "react";
 import { TCategories } from "@/types/categories.types";

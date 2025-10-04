@@ -3,7 +3,7 @@
 import { getCurrentUser } from "@/services/auth";
 import { IUser } from "@/types/user.types";
 
-import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 
 export interface IUserProviderValues {
   user: IUser | null;
@@ -20,7 +20,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isMounted, setIsMounted] = useState(false);
 
-  const handleUser = async () => {
+  const handleUser = useCallback(async () => {
     if (!isMounted) return;
     try {
       const user = await getCurrentUser();
@@ -31,7 +31,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isMounted]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -41,7 +41,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     if (isMounted) {
       handleUser();
     }
-  }, [isMounted]);
+  }, [isMounted, handleUser]);
 
   const contextValue = {
     user,

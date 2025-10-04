@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import useUser from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
 import { FaSpinner } from "react-icons/fa";
-import GoogleLogin from "../GoogleLogin/GoogleLogin";
+import GoogleLogin from "@/components/auth/GoogleLogin/GoogleLogin";
 
 interface LoginFormData {
   email: string;
