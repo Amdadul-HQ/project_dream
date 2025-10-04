@@ -33,40 +33,61 @@ export interface NotificationResponse {
 class NotificationService {
   private socket: Socket | null = null;
   private eventHandlers: Map<string, Set<Function>> = new Map();
+  private isConnecting: boolean = false;
 
   connect(userId: string, token: string) {
-    if (this.socket?.connected) {
-      return;
-    }
-    console.log(token,'token')
+  if (this.socket?.connected || this.isConnecting) {
+    return;
+  }
 
-    this.socket = io(process.env.NEXT_PUBLIC_BASE_API || "", {
-      auth: { token },
+  this.isConnecting = true;
+
+  try {
+    this.socket = io('http://localhost:5005/notifications', {
+      auth: { token, userId },
       query: { userId },
       transports: ["websocket", "polling"],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
     });
 
     this.socket.on("connect", () => {
-      console.log("WebSocket connected");
+      console.log("✅ WebSocket connected for user:", userId);
+      this.isConnecting = false;
     });
 
-    this.socket.on("disconnect", () => {
-      console.log("WebSocket disconnected");
+    this.socket.on("connect_error", (error) => {
+      console.error("❌ WebSocket connection error:", error);
+      this.isConnecting = false;
     });
 
+    this.socket.on("disconnect", (reason) => {
+      console.log("🔌 WebSocket disconnected:", reason);
+      this.isConnecting = false;
+    });
+
+    // Listen for new notifications
     this.socket.on("notification:new", (notification: Notification) => {
+      console.log("🔔 New notification received:", notification);
       this.emit("notification:new", notification);
     });
 
     this.socket.on("notification:allRead", () => {
       this.emit("notification:allRead");
     });
+  } catch (error) {
+    console.error("Failed to initialize WebSocket:", error);
+    this.isConnecting = false;
   }
+}
 
   disconnect() {
     if (this.socket) {
       this.socket.disconnect();
       this.socket = null;
+      this.isConnecting = false;
     }
   }
 
@@ -89,6 +110,10 @@ class NotificationService {
     if (this.socket?.connected) {
       this.socket.emit("notification:markAllRead");
     }
+  }
+
+  isConnected(): boolean {
+    return this.socket?.connected || false;
   }
 }
 
@@ -131,9 +156,13 @@ export async function fetchNotifications(
  * Mark a single notification as read
  */
 export async function markNotificationAsRead(
-notificationId: string, token: string): Promise<void> {
+  notificationId: string,
+  token?: string
+): Promise<void> {
   try {
-    const token = await getTokenFromCookie();
+    if (!token) {
+      throw new Error("Missing authentication token");
+    }
     
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/notifications/${notificationId}/read`,
@@ -157,9 +186,11 @@ notificationId: string, token: string): Promise<void> {
 /**
  * Mark all notifications as read
  */
-export async function markAllNotificationsAsRead(token: string): Promise<void> {
+export async function markAllNotificationsAsRead(token?: string): Promise<void> {
   try {
-    const token = await getTokenFromCookie();
+    if (!token) {
+      throw new Error("Missing authentication token");
+    }
     
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/notifications/read-all`,
@@ -178,17 +209,4 @@ export async function markAllNotificationsAsRead(token: string): Promise<void> {
     console.error("Error marking all notifications as read:", error);
     throw error;
   }
-}
-
-/**
- * Helper to get token from cookie (client-side)
- */
-function getTokenFromCookie(): string | undefined {
-  if (typeof window === "undefined") return undefined;
-  
-  const cookie = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("accessToken="));
-  
-  return cookie?.split("=")[1];
 }

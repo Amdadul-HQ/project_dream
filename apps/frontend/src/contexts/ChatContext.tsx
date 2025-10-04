@@ -1,351 +1,210 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useReducer, useEffect, ReactNode, useCallback } from 'react';
-import { useSocket } from '../hooks/useSocket';
-import { PrivateMessage, Conversation, User } from '../services/socket';
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { chatService, Conversation, ChatMessage } from "../services/chat";
+import { getAccessToken } from "@/services/auth";
+import useUser from "@/hooks/useUser";
 
-// Types
-interface ChatState {
+interface ChatContextType {
   conversations: Conversation[];
-  currentConversation: string | null;
-  messages: Record<string, PrivateMessage[]>;
-  typingUsers: Record<string, boolean>;
-  onlineUsers: Set<string>;
-  loading: boolean;
-  error: string | null;
-}
-
-type ChatAction =
-  | { type: 'SET_CONVERSATIONS'; payload: Conversation[] }
-  | { type: 'SET_CURRENT_CONVERSATION'; payload: string | null }
-  | { type: 'ADD_MESSAGE'; payload: { message: PrivateMessage; currentUserId: string } }
-  | { type: 'UPDATE_MESSAGE_STATUS'; payload: { messageId: string; status: string } }
-  | { type: 'SET_MESSAGES'; payload: { conversationId: string; messages: PrivateMessage[] } }
-  | { type: 'SET_TYPING'; payload: { userId: string; isTyping: boolean } }
-  | { type: 'SET_USER_STATUS'; payload: { userId: string; status: string } }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'UPDATE_CONVERSATION_LAST_MESSAGE'; payload: { conversationId: string; message: string; timestamp: string } };
-
-// Initial state
-const initialState: ChatState = {
-  conversations: [],
-  currentConversation: null,
-  messages: {},
-  typingUsers: {},
-  onlineUsers: new Set(),
-  loading: false,
-  error: null,
-};
-
-// Reducer
-function chatReducer(state: ChatState, action: ChatAction): ChatState {
-  switch (action.type) {
-    case 'SET_CONVERSATIONS':
-      return { ...state, conversations: action.payload };
-    
-    case 'SET_CURRENT_CONVERSATION':
-      return { ...state, currentConversation: action.payload };
-    
-    case 'ADD_MESSAGE':
-      const { message, currentUserId } = action.payload;
-      const conversationId = message.senderId === currentUserId 
-        ? message.recipientId 
-        : message.senderId;
-      
-      return {
-        ...state,
-        messages: {
-          ...state.messages,
-          [conversationId]: [
-            ...(state.messages[conversationId] || []),
-            message
-          ]
-        }
-      };
-    
-    case 'UPDATE_MESSAGE_STATUS':
-      const { messageId, status } = action.payload;
-      const updatedMessages = { ...state.messages };
-      
-      Object.keys(updatedMessages).forEach(convId => {
-        updatedMessages[convId] = updatedMessages[convId].map(msg =>
-          msg.id === messageId ? { ...msg, status: status as any } : msg
-        );
-      });
-      
-      return { ...state, messages: updatedMessages };
-    
-    case 'SET_MESSAGES':
-      return {
-        ...state,
-        messages: {
-          ...state.messages,
-          [action.payload.conversationId]: action.payload.messages
-        }
-      };
-    
-    case 'SET_TYPING':
-      return {
-        ...state,
-        typingUsers: {
-          ...state.typingUsers,
-          [action.payload.userId]: action.payload.isTyping
-        }
-      };
-    
-    case 'SET_USER_STATUS':
-      const { userId, status: userStatus } = action.payload;
-      const newOnlineUsers = new Set(state.onlineUsers);
-      
-      if (userStatus === 'online') {
-        newOnlineUsers.add(userId);
-      } else {
-        newOnlineUsers.delete(userId);
-      }
-      
-      return {
-        ...state,
-        onlineUsers: newOnlineUsers,
-        conversations: state.conversations.map(conv =>
-          conv.user.id === userId
-            ? { ...conv, user: { ...conv.user, status: userStatus as any } }
-            : conv
-        )
-      };
-    
-    case 'SET_LOADING':
-      return { ...state, loading: action.payload };
-    
-    case 'SET_ERROR':
-      return { ...state, error: action.payload };
-    
-    case 'UPDATE_CONVERSATION_LAST_MESSAGE':
-      return {
-        ...state,
-        conversations: state.conversations.map(conv =>
-          conv.id === action.payload.conversationId
-            ? {
-                ...conv,
-                lastMessage: action.payload.message,
-                timestamp: action.payload.timestamp
-              }
-            : conv
-        )
-      };
-    
-    default:
-      return state;
-  }
-}
-
-// Context
-interface ChatContextType extends ChatState {
-  sendMessage: (recipientId: string, content: string, file?: File) => void;
-  setCurrentConversation: (conversationId: string | null) => void;
-  loadConversations: () => Promise<void>;
-  loadMessages: (conversationId: string) => Promise<void>;
+  activeConversation: Conversation | null;
+  messages: ChatMessage[];
+  isConnected: boolean;
+  unreadCount: number;
+  setActiveConversation: (conversation: Conversation | null) => void;
+  sendMessage: (recipientId: string, content: string) => void;
+  loadMoreMessages: () => void;
   markAsRead: (conversationId: string) => void;
-  sendTyping: (recipientId: string, isTyping: boolean) => void;
-  userId: string;
+  getOnlineStatus: (userIds: string[]) => void;
+  onlineUsers: Record<string, boolean>;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
-// Provider component
-interface ChatProviderProps {
-  children: ReactNode;
-  token?: string;
-  userId?: string;
-}
+export function ChatProvider({ children }: { children: React.ReactNode }) {
+  const { user, isLoading: isUserLoading } = useUser();
+  const [token, setToken] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState<Record<string, boolean>>({});
+  const [cursor, setCursor] = useState<string | null>(null);
 
-export function ChatProvider({ children, token, userId = '' }: ChatProviderProps) {
-  const [state, dispatch] = useReducer(chatReducer, initialState);
-  const {
-    isConnected,
-    sendMessage: socketSendMessage,
-    sendTyping: socketSendTyping,
-    onMessage,
-    onMessageStatus,
-    onTyping,
-    onUserStatus,
-    requestConversations,
-    onConversations,
-    requestChatHistory,
-    onChatHistory,
-    markMessagesRead,
-  } = useSocket(token);
-
-  // Set up socket listeners for real-time communication
+  // Get token when user is available
   useEffect(() => {
-    if (!isConnected) return;
-    // Request conversations list when socket connects
-    try {
-      requestConversations?.();
-    } catch (err) {
-      console.warn('requestConversations failed:', err);
-    }
+    const fetchToken = async () => {
+      if (user) {
+        const accessToken = await getAccessToken();
+        setToken(accessToken || null);
+      }
+    };
+    fetchToken();
+  }, [user]);
 
-    const unsubscribeMessage = onMessage((message: PrivateMessage) => {
-      dispatch({ type: 'ADD_MESSAGE', payload: { message, currentUserId: userId } });
-      
-      // Update conversation last message
-      const conversationId = message.senderId === userId 
-        ? message.recipientId 
-        : message.senderId;
-      
-      dispatch({
-        type: 'UPDATE_CONVERSATION_LAST_MESSAGE',
-        payload: {
-          conversationId,
-          message: message.content,
-          timestamp: message.timestamp
-        }
+  // Connect to chat when token is available
+  useEffect(() => {
+    if (!token || !user) return;
+
+    chatService.connect(token);
+
+    const handleConnect = () => {
+      setIsConnected(true);
+      // Load conversations on connect
+      chatService.loadConversations();
+    };
+
+    const handleDisconnect = () => setIsConnected(false);
+
+    const handleNewMessage = (message: ChatMessage) => {
+      console.log("New message received1111:", message);
+      // Add to messages if it's for active conversation
+      if (message.conversationId === activeConversation?.id) {
+        setMessages((prev) => [...prev, message]);
+      }
+
+      // Update conversations list
+      setConversations((prev) => {
+        const updated = prev.map((conv) => {
+          if (conv.id === message.conversationId) {
+            return {
+              ...conv,
+              messages: [message],
+              lastMessageAt: message.createdAt,
+            };
+          }
+          return conv;
+        });
+        return updated.sort(
+          (a, b) =>
+            new Date(b.lastMessageAt).getTime() -
+            new Date(a.lastMessageAt).getTime()
+        );
       });
-    });
+    };
 
-    const unsubscribeMessageStatus = onMessageStatus((data) => {
-      dispatch({ type: 'UPDATE_MESSAGE_STATUS', payload: data });
-    });
+    const handleChatHistory = (data: {
+      conversationId: string;
+      messages: ChatMessage[];
+      nextCursor: string | null;
+    }) => {
+      console.log(data, "chat history data");
+      setMessages(data.messages);
+      setCursor(data.nextCursor);
+    };
 
-    const unsubscribeTyping = onTyping((data) => {
-      dispatch({ type: 'SET_TYPING', payload: data });
-    });
+    const handleConversations = (convs: Conversation[]) => {
+      setConversations(convs);
+    };
 
-    const unsubscribeUserStatus = onUserStatus((data) => {
-      dispatch({ type: 'SET_USER_STATUS', payload: data });
-    });
+    const handleMessagesRead = (data: {
+      conversationId: string;
+      userId: string;
+    }) => {
+      console.log(data, "messages read data");
+      if (data.conversationId === activeConversation?.id) {
+        setMessages((prev) =>
+          prev.map((msg) => ({
+            ...msg,
+            statuses: msg.statuses?.map((status) =>
+              status.userId === data.userId
+                ? { ...status, status: "READ" as const }
+                : status
+            ),
+          }))
+        );
+      }
+    };
 
-    // Listen for conversations payload from server
-    const unsubscribeConversations = onConversations((conversations: any[]) => {
-      // Map server conversation shape to Conversation[] if necessary
-      dispatch({ type: 'SET_CONVERSATIONS', payload: conversations as Conversation[] });
-    });
+    const handleOnlineStatus = (status: Record<string, boolean>) => {
+      setOnlineUsers(status);
+    };
 
-    // Listen for chat history payload
-    const unsubscribeChatHistory = onChatHistory((messages: PrivateMessage[]) => {
-      if (!messages || messages.length === 0) return;
-      const convId = messages[0].senderId === userId ? messages[0].recipientId : messages[0].senderId;
-      dispatch({ type: 'SET_MESSAGES', payload: { conversationId: convId, messages } });
-    });
+    chatService.on("connect", handleConnect);
+    chatService.on("disconnect", handleDisconnect);
+    chatService.on("private:new_message", handleNewMessage);
+    chatService.on("private:chat_history", handleChatHistory);
+    chatService.on("private:conversations", handleConversations);
+    chatService.on("private:messages_read", handleMessagesRead);
+    chatService.on("private:online_status", handleOnlineStatus);
+
+    // Load conversations if already connected
+    if (chatService.isConnected()) {
+      chatService.loadConversations();
+    }
 
     return () => {
-      unsubscribeMessage();
-      unsubscribeMessageStatus();
-      unsubscribeTyping();
-      unsubscribeUserStatus();
-      unsubscribeConversations();
-      unsubscribeChatHistory();
+      chatService.off("connect", handleConnect);
+      chatService.off("disconnect", handleDisconnect);
+      chatService.off("private:new_message", handleNewMessage);
+      chatService.off("private:chat_history", handleChatHistory);
+      chatService.off("private:conversations", handleConversations);
+      chatService.off("private:messages_read", handleMessagesRead);
+      chatService.off("private:online_status", handleOnlineStatus);
+      chatService.disconnect();
     };
-  }, [isConnected, userId, onMessage, onMessageStatus, onTyping, onUserStatus, onConversations, onChatHistory, requestConversations]);
+  }, [token, user, activeConversation?.id]);
 
-  // Actions
-  const sendMessage = useCallback((recipientId: string, content: string, file?: File) => {
-    if (!isConnected) {
-      dispatch({ type: 'SET_ERROR', payload: 'Not connected to chat server' });
-      return;
+  // Load messages when active conversation changes
+  useEffect(() => {
+    if (activeConversation) {
+      chatService.loadMessages(activeConversation.id);
+      chatService.markAsRead(activeConversation.id);
     }
+  }, [activeConversation?.id]);
 
-    const dto = { content };
+  const unreadCount = conversations.reduce((count, conv) => {
+    const lastMessage = conv.messages[0];
+    if (lastMessage && lastMessage.senderId !== user?.id) {
+      const myStatus = lastMessage.statuses?.find(
+        (s) => s.userId === user?.id
+      );
+      if (myStatus?.status !== "READ") {
+        return count + 1;
+      }
+    }
+    return count;
+  }, 0);
 
-    // Send message using the WebSocket with proper format
-    socketSendMessage(recipientId, dto, userId, file);
-
-    // Optimistically add message to state
-    const optimisticMessage: PrivateMessage = {
-      id: Date.now().toString(), // Temporary ID
-      content,
-      senderId: userId,
-      recipientId,
-      timestamp: new Date().toISOString(),
-      status: 'sent'
-    };
-
-    dispatch({ type: 'ADD_MESSAGE', payload: { message: optimisticMessage, currentUserId: userId } });
-  }, [isConnected, socketSendMessage, userId]);
-
-  const setCurrentConversation = useCallback((conversationId: string | null) => {
-    dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversationId });
+  const handleSendMessage = useCallback((recipientId: string, content: string) => {
+    chatService.sendMessage(recipientId, content);
   }, []);
 
-  const loadConversations = useCallback(async () => {
-    try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      // If socket is connected, conversations will be populated via the onConversations listener
-      // which is triggered by requestConversations() on connect. If not connected, implement
-      // a REST fallback here to fetch conversations from the API.
-    } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Failed to load conversations' });
-    } finally {
-      dispatch({ type: 'SET_LOADING', payload: false });
+  const loadMoreMessages = useCallback(() => {
+    if (cursor && activeConversation) {
+      chatService.loadMessages(activeConversation.id, 20, cursor);
     }
+  }, [cursor, activeConversation]);
+
+  const handleMarkAsRead = useCallback((conversationId: string) => {
+    chatService.markAsRead(conversationId);
   }, []);
 
-  const loadMessages = useCallback(async (conversationId: string) => {
-    try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      // If socket is connected, request history via socket and let the onChatHistory listener
-      // populate the messages. If socket isn't connected, implement a REST fallback here.
-      if (isConnected) {
-        try {
-          requestChatHistory(conversationId);
-          return;
-        } catch (err) {
-          console.warn('requestChatHistory failed:', err);
-        }
-      }
-    } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Failed to load messages' });
-    } finally {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
-  }, [userId, isConnected, requestChatHistory]);
+  const handleGetOnlineStatus = useCallback((userIds: string[]) => {
+    chatService.getOnlineStatus(userIds);
+  }, []);
 
-  const markAsRead = useCallback((conversationId: string) => {
-    // Emit messages read via socket
-    if (isConnected) {
-      // For simplicity, mark all messages in conversation as read
-      const msgs = state.messages[conversationId] || [];
-      const messageIds = msgs.map(m => m.id);
-      try {
-        markMessagesRead(conversationId, messageIds);
-      } catch (err) {
-        console.warn('markMessagesRead failed:', err);
-      }
-    } else {
-      console.log('Not connected - cannot mark messages as read');
-    }
-  }, [isConnected, markMessagesRead, state.messages]);
-
-  const sendTyping = useCallback((recipientId: string, isTyping: boolean) => {
-    if (isConnected) {
-      socketSendTyping(recipientId, isTyping);
-    }
-  }, [isConnected, socketSendTyping]);
-
-  const contextValue: ChatContextType = {
-    ...state,
-    sendMessage,
-    setCurrentConversation,
-    loadConversations,
-    loadMessages,
-    markAsRead,
-    sendTyping,
-    userId,
+  const value: ChatContextType = {
+    conversations,
+    activeConversation,
+    messages,
+    isConnected,
+    unreadCount,
+    setActiveConversation,
+    sendMessage: handleSendMessage,
+    loadMoreMessages,
+    markAsRead: handleMarkAsRead,
+    getOnlineStatus: handleGetOnlineStatus,
+    onlineUsers,
   };
 
-  return (
-    <ChatContext.Provider value={contextValue}>
-      {children}
-    </ChatContext.Provider>
-  );
+  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 }
 
-// Hook to use chat context
 export function useChat() {
   const context = useContext(ChatContext);
-  if (context === undefined) {
-    throw new Error('useChat must be used within a ChatProvider');
+  if (!context) {
+    throw new Error("useChat must be used within ChatProvider");
   }
   return context;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Plus, X, Menu } from "lucide-react";
+import { Search, Plus, X, Menu, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -9,15 +9,12 @@ import Logo from "./Logo/Logo";
 import useUser from "@/hooks/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { logout } from "@/services/auth";
-import { usePathname } from "next/navigation";
 import NotificationDropdown from "../notification/NotificationDropdown";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState("All");
   const { user, setIsLoading, setUser } = useUser();
-  console.log(user)
 
   const navItems = [
     "All",
@@ -101,6 +98,21 @@ const Navbar = () => {
               {user && user.id && user.token && (
                 <NotificationDropdown userId={user.id} token={user.token} />
               )}
+
+              {
+                user && user.id && user.token && (
+                  <Link href={"/chat"}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="cursor-pointer text-gray-700 bg-hover hover:text-gray-900"
+                    >
+                      <MessageCircle/>
+                      Messages
+                    </Button>
+                  </Link>
+                )
+              }
 
               <Link
                 href={user ? "/post-blog" : `/login?redirectPath=/post-blog`}

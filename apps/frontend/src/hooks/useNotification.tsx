@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 
 export default function useNotifications(userId?: string, token?: string) {
-    console.log(token,'helo')
+
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,7 +66,6 @@ export default function useNotifications(userId?: string, token?: string) {
       setIsLoading(true);
       try {
         const response: any = await fetchNotifications(pageNum, 20, token);
-        console.log(response,'response')
         if (pageNum === 1) {
           setNotifications(response?.items || []);
         } else {
