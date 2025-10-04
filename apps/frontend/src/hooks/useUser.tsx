@@ -1,29 +1,15 @@
+// hooks/useUser.ts
 "use client";
 
 import { UserContext } from "@/context/UserContext";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 
-const useUser = () => {
+export default function useUser() {
   const context = useContext(UserContext);
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // During SSR or before hydration, return a default context
-  if (!isMounted) {
-    return {
-      user: null,
-      isLoading: true,
-      setUser: () => {},
-      setIsLoading: () => {},
-    };
-  }
 
   if (context === undefined) {
-    throw new Error("useUser must be used within the UserProvider context");
+    throw new Error("useUser must be used within a UserProvider");
   }
+
   return context;
-};
-export default useUser;
+}

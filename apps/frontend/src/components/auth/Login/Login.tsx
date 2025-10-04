@@ -1,6 +1,5 @@
 "use client";
 import { useState, ChangeEvent, FormEvent } from "react";
-import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import Link from "next/link";
 import Logo from "@/components/shared/Logo/Logo";
@@ -37,14 +36,30 @@ export default function Login() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setIsLoading(true);
     
     try {
       const res = await loginUser(formData);
       
       if (res?.success) {
         toast.success("Login successful!");
-        setUser(res?.data?.user);
-        setIsLoading(false);
+        
+        // Create user object with token
+        const userWithToken = {
+          id: res?.data?.user?.id,
+          name: res?.data?.user?.name,
+          phone: res?.data?.user?.phone,
+          email: res?.data?.user?.email,
+          address: res?.data?.user?.address,
+          profile: res?.data?.user?.profile,
+          isVerified: res?.data?.user?.isVerified,
+          role: res?.data?.user?.role,
+          isGoogle: res?.data?.user?.isGoogle,
+          status: res?.data?.user?.status,
+          token: res?.data?.token,
+        };
+        
+        setUser(userWithToken);
         
         // Route based on user role
         if (res?.data?.user?.role === "USER" || res?.data?.user?.role === "WRITER") {
@@ -60,6 +75,7 @@ export default function Login() {
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
@@ -122,7 +138,7 @@ export default function Login() {
 
           {/* Redirect to Register */}
           <p className="text-sm text-center mt-2 font-medium">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="text-[#2F2685] hover:underline">
               Register
             </Link>

@@ -31,7 +31,14 @@ export default function useGoogleAuth() {
 
         if (res?.success) {
           toast.success("Login successful!");
-          setUser(res?.data?.user);
+          
+          // Create user object with token
+          const userWithToken = {
+            ...res?.data?.user,
+            token: res?.data?.token,
+          };
+          
+          setUser(userWithToken);
           
           // Redirect based on role
           if (res?.data?.user?.role === "USER") {

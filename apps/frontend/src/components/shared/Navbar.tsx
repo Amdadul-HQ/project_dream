@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from "react";
-import { Search, Plus, X, Menu} from "lucide-react";
+
+import { useState } from "react";
+import { Search, Plus, X, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -9,27 +10,36 @@ import useUser from "@/hooks/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { logout } from "@/services/auth";
 import { usePathname } from "next/navigation";
+import NotificationDropdown from "../notification/NotificationDropdown";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState("All");
-  const { user, setIsLoading,setUser } = useUser();
-  console.log(user);
+  const { user, setIsLoading, setUser } = useUser();
+  console.log(user)
 
-  const navItems = ["All", "Horror", "Islamic", "Science", "Mystery", "Thriller", "Adventure", "Historical", "Biography", "Drama"];
+  const navItems = [
+    "All",
+    "Horror",
+    "Islamic",
+    "Science",
+    "Mystery",
+    "Thriller",
+    "Adventure",
+    "Historical",
+    "Biography",
+    "Drama",
+  ];
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const handleLogOut = () => {
-    logout();
+  const handleLogOut = async () => {
+    await logout();
     setIsLoading(true);
     setUser(null);
-    // if (protectedRoutes.some((route) => pathname.match(route))) {
-    //   router.push("/");
-    // }
   };
 
   return (
@@ -39,9 +49,6 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            {/* <div className="flex items-center">
-              <Image src={logo} alt="Obliq Logo" width={100} height={60} className="w-full min-h-[35px]" />
-            </div> */}
             <Logo />
           </div>
 
@@ -54,7 +61,7 @@ const Navbar = () => {
               <Input
                 type="text"
                 placeholder="Search"
-                className="pl-10 pr-4 py-2 w-full  border-gray-200 rounded-md text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="pl-10 pr-4 py-2 w-full border-gray-200 rounded-md text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -68,22 +75,36 @@ const Navbar = () => {
 
             {/* Desktop Actions */}
             <div className="hidden sm:flex items-center space-x-3">
-              {
-                !user && <Link href={"/login"}>
-                <Button variant="ghost" size="sm" className="cursor-pointer text-gray-700 bg-hover hover:text-gray-900">
-                  Log in
-                </Button>
-              </Link>
-              }
-              {
-                !user && <Link href={"/register"}>
-                <Button size="sm" className="cursor-pointer bg-accent hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
-                  Sign up
-                </Button>
-              </Link>
-              }
-              
-              <Link href={user ? "/post-blog" : `/login?redirectPath=/post-blog`}>
+              {!user && (
+                <Link href={"/login"}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="cursor-pointer text-gray-700 bg-hover hover:text-gray-900"
+                  >
+                    Log in
+                  </Button>
+                </Link>
+              )}
+              {!user && (
+                <Link href={"/register"}>
+                  <Button
+                    size="sm"
+                    className="cursor-pointer bg-accent hover:bg-indigo-700 text-white px-4 py-2 rounded-md"
+                  >
+                    Sign up
+                  </Button>
+                </Link>
+              )}
+
+              {/* Notification Dropdown - Only shows when user is logged in */}
+              {user && user.id && user.token && (
+                <NotificationDropdown userId={user.id} token={user.token} />
+              )}
+
+              <Link
+                href={user ? "/post-blog" : `/login?redirectPath=/post-blog`}
+              >
                 <Button
                   size="sm"
                   className="cursor-pointer bg-accent hover:bg-indigo-700 text-white px-3 py-2 rounded-md flex items-center space-x-1"
@@ -94,45 +115,47 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {
-                user && 
-                <Button onClick={handleLogOut} size="sm" className="cursor-pointer bg-accent hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
-                  Logout
-                </Button>
-              }
+            {user && (
+              <Button
+                onClick={handleLogOut}
+                size="sm"
+                className="cursor-pointer bg-accent hover:bg-indigo-700 text-white px-4 py-2 rounded-md"
+              >
+                Logout
+              </Button>
+            )}
 
             {/* User Avatar */}
-            {
-              user && <Button variant="ghost" size="sm" className="p-1">
-              <Link href={"/profile/overview"}>
-                <Avatar>
-                  <AvatarImage src={user?.profile ||"https://github.com/shadcn.png"} className="border-2 rounded-full border-slate-300"/>
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-              </Link>
-            </Button>
-            }
-            
+            {user && (
+              <Button variant="ghost" size="sm" className="p-1">
+                <Link href={"/profile/overview"}>
+                  <Avatar>
+                    <AvatarImage
+                      src={user?.profile || "https://github.com/shadcn.png"}
+                      className="border-2 rounded-full border-slate-300"
+                    />
+                    <AvatarFallback>
+                      {user?.name?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
+              </Button>
+            )}
 
             {/* Mobile Menu Button */}
-            <Button variant="ghost" size="sm" className="md:hidden p-2" onClick={toggleMobileMenu}>
-              {isMobileMenuOpen ? <X className="h-5 w-5 text-gray-600" /> : <Menu className="h-5 w-5 text-gray-600" />}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden p-2"
+              onClick={toggleMobileMenu}
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-5 w-5 text-gray-600" />
+              ) : (
+                <Menu className="h-5 w-5 text-gray-600" />
+              )}
             </Button>
           </div>
-        </div>
-
-        {/* Mobile Search Bar */}
-        <div className="md:hidden">
-          {/* <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-gray-400" />
-            </div>
-            <Input
-              type="text"
-              placeholder="Search"
-              className="pl-10 pr-4 py-2 w-full bg-gray-50 border-gray-200 rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            />
-          </div> */}
         </div>
 
         {/* Category Navigation */}
@@ -144,7 +167,9 @@ const Navbar = () => {
                 key={item}
                 onClick={() => setActiveTab(item)}
                 className={`text-sm font-medium transition-colors duration-200 py-2 px-1 border-b-2 ${
-                  activeTab === item ? "text-white px-3 bg-accent rounded-md" : "text-tertiary border-transparent hover:border-gray-300"
+                  activeTab === item
+                    ? "text-white px-3 bg-accent rounded-md"
+                    : "text-tertiary border-transparent hover:border-gray-300"
                 }`}
               >
                 {item}
@@ -163,7 +188,9 @@ const Navbar = () => {
                     setIsMobileMenuOpen(false);
                   }}
                   className={`block w-full text-left px-3 py-2 text-sm font-medium transition-colors duration-200 rounded-md ${
-                    activeTab === item ? "text-indigo-600 bg-brand" : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    activeTab === item
+                      ? "text-indigo-600 bg-brand"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   }`}
                 >
                   {item}
@@ -172,14 +199,23 @@ const Navbar = () => {
 
               {/* Mobile Actions */}
               <div className="pt-4 border-t border-gray-100 space-y-2">
-                <Link href={"/login"}>
-                  <Button variant="ghost" className="cursor-pointer w-full justify-start text-gray-700 hover:text-gray-900">
-                    Log in
-                  </Button>
-                </Link>
-                <Link href={"/register"}>
-                  <Button className="cursor-pointer w-full bg-indigo-600 hover:bg-indigo-700 text-white">Sign up</Button>
-                </Link>
+                {!user && (
+                  <>
+                    <Link href={"/login"}>
+                      <Button
+                        variant="ghost"
+                        className="cursor-pointer w-full justify-start text-gray-700 hover:text-gray-900"
+                      >
+                        Log in
+                      </Button>
+                    </Link>
+                    <Link href={"/register"}>
+                      <Button className="cursor-pointer w-full bg-indigo-600 hover:bg-indigo-700 text-white">
+                        Sign up
+                      </Button>
+                    </Link>
+                  </>
+                )}
                 <Link href={"/post-blog"}>
                   <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center space-x-2 cursor-pointer">
                     <Plus className="h-4 w-4" />

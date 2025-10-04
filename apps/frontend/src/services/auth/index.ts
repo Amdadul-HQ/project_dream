@@ -4,6 +4,42 @@ import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
 
 /**
+ * Helper function to save user data in cookies
+ */
+const saveAuthData = async (token: string, user: any) => {
+  const cookieStore = await cookies();
+
+  // Save token in cookies
+  cookieStore.set("accessToken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+  });
+
+  // Save essential user data in cookies
+  const userCookieData = {
+    id: user.id,
+    name: user.name,
+    phone: user.phone,
+    email: user.email,
+    address: user.address,
+    profile: user.profile,
+    isVerified: user.isVerified,
+    role: user.role,
+    isGoogle: user.isGoogle,
+    status: user.status,
+  };
+
+  cookieStore.set("user", JSON.stringify(userCookieData), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 7,
+  });
+};
+
+/**
  * Register user with email/password
  */
 export const registerUser = async (userData: FormData) => {
@@ -24,8 +60,6 @@ export const registerUser = async (userData: FormData) => {
  * Login user with email/password
  */
 export const loginUser = async (userData: FieldValues) => {
-  const cookieStore = await cookies();
-
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/login`, {
       method: "POST",
@@ -38,21 +72,7 @@ export const loginUser = async (userData: FieldValues) => {
     const result = await res.json();
 
     if (result?.success) {
-      // Save token in cookies
-      cookieStore.set("accessToken", result?.data?.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      });
-
-      // Save user in cookies
-      cookieStore.set("user", JSON.stringify(result?.data?.user), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 7,
-      });
+      await saveAuthData(result?.data?.token, result?.data?.user);
     }
 
     return result;
@@ -63,7 +83,7 @@ export const loginUser = async (userData: FieldValues) => {
 };
 
 /**
- * Get current logged-in user
+ * Get current logged-in user with token
  */
 export const getCurrentUser = async () => {
   const cookieStore = await cookies();
@@ -72,7 +92,11 @@ export const getCurrentUser = async () => {
 
   if (accessToken && userCookie) {
     try {
-      return JSON.parse(userCookie);
+      const user = JSON.parse(userCookie);
+      return {
+        ...user,
+        token: accessToken,
+      };
     } catch (err) {
       console.error("Error parsing user cookie:", err);
       return null;
@@ -80,6 +104,14 @@ export const getCurrentUser = async () => {
   }
 
   return null;
+};
+
+/**
+ * Get access token
+ */
+export const getAccessToken = async () => {
+  const cookieStore = await cookies();
+  return cookieStore.get("accessToken")?.value;
 };
 
 /**
@@ -97,25 +129,8 @@ export const logout = async () => {
  * Store Google auth token and user after successful login
  */
 export const storeGoogleAuthData = async (token: string, user: any) => {
-  const cookieStore = await cookies();
-
   try {
-    // Save token in cookies
-    cookieStore.set("accessToken", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-    });
-
-    // Save user in cookies
-    cookieStore.set("user", JSON.stringify(user), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
-    });
-
+    await saveAuthData(token, user);
     return { success: true };
   } catch (error: any) {
     console.error("Store auth data error:", error);
@@ -127,8 +142,6 @@ export const storeGoogleAuthData = async (token: string, user: any) => {
  * Send Google JWT credential to backend
  */
 export const sendGoogleLogin = async (data: { code: string }) => {
-  const cookieStore = await cookies();
-
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/auth/google/credential`,
@@ -144,26 +157,46 @@ export const sendGoogleLogin = async (data: { code: string }) => {
     const result = await res.json();
 
     if (result?.success) {
-      // Save token in cookies
-      cookieStore.set("accessToken", result?.data?.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      });
-
-      // Save user in cookies
-      cookieStore.set("user", JSON.stringify(result?.data?.user), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 7,
-      });
+      await saveAuthData(result?.data?.token, result?.data?.user);
     }
 
     return result;
   } catch (error: any) {
     console.error("Google login error:", error);
     return { success: false, message: error.message || "Google login failed" };
+  }
+};
+
+/**
+ * Update user profile data in cookies
+ */
+export const updateUserInCookie = async (updatedUser: any) => {
+  const cookieStore = await cookies();
+
+  try {
+    const userCookieData = {
+      id: updatedUser.id,
+      name: updatedUser.name,
+      phone: updatedUser.phone,
+      email: updatedUser.email,
+      address: updatedUser.address,
+      profile: updatedUser.profile,
+      isVerified: updatedUser.isVerified,
+      role: updatedUser.role,
+      isGoogle: updatedUser.isGoogle,
+      status: updatedUser.status,
+    };
+
+    cookieStore.set("user", JSON.stringify(userCookieData), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Update user cookie error:", error);
+    return { success: false, message: error.message };
   }
 };

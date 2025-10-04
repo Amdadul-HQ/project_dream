@@ -2,7 +2,6 @@
 
 import { getCurrentUser } from "@/services/auth";
 import { IUser } from "@/types/user.types";
-
 import {
   createContext,
   Dispatch,
@@ -17,9 +16,10 @@ export interface IUserProviderValues {
   isLoading: boolean;
   setUser: (user: IUser | null) => void;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
+  refreshUser: () => Promise<void>;
 }
 
-//Create Context
+// Create Context
 export const UserContext = createContext<IUserProviderValues | undefined>(
   undefined
 );
@@ -32,8 +32,8 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const handleUser = useCallback(async () => {
     if (!isMounted) return;
     try {
-      const user = await getCurrentUser();
-      setUser(user);
+      const userData = await getCurrentUser();
+      setUser(userData);
     } catch (error) {
       console.error("Error fetching user:", error);
       setUser(null);
@@ -41,6 +41,11 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
     }
   }, [isMounted]);
+
+  const refreshUser = useCallback(async () => {
+    setIsLoading(true);
+    await handleUser();
+  }, [handleUser]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -57,6 +62,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     isLoading,
     setIsLoading,
     setUser,
+    refreshUser,
   };
 
   // Don't render provider until client-side is mounted
@@ -68,6 +74,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
           isLoading: true,
           setIsLoading: () => {},
           setUser: () => {},
+          refreshUser: async () => {},
         }}
       >
         {children}
@@ -81,4 +88,5 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     </UserContext.Provider>
   );
 };
+
 export default UserProvider;
