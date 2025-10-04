@@ -1,3 +1,5 @@
+"use client";
+
 import { getCurrentUser } from "@/services/auth";
 import { IUser } from "@/types/user.types";
 
@@ -16,16 +18,30 @@ export const UserContext = createContext<IUserProviderValues | undefined>(undefi
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<IUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isMounted, setIsMounted] = useState(false);
 
   const handleUser = async () => {
-    const user = await getCurrentUser();
-    setUser(user);
-    setIsLoading(false);
+    if (!isMounted) return;
+    try {
+      const user = await getCurrentUser();
+      setUser(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    handleUser();
+    setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      handleUser();
+    }
+  }, [isMounted]);
 
   const contextValue = {
     user,
@@ -33,6 +49,21 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading,
     setUser,
   };
+  
+  // Don't render provider until client-side is mounted
+  if (!isMounted) {
+    return (
+      <UserContext.Provider value={{
+        user: null,
+        isLoading: true,
+        setIsLoading: () => {},
+        setUser: () => {},
+      }}>
+        {children}
+      </UserContext.Provider>
+    );
+  }
+
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 };
 export default UserProvider;

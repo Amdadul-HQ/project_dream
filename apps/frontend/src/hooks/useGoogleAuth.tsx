@@ -5,12 +5,20 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import useUser from "@/hooks/useUser";
 import { sendGoogleLogin } from "@/services/auth";
+import { useEffect, useState } from "react";
 
 export default function useGoogleAuth() {
   const router = useRouter();
   const { setUser, setIsLoading } = useUser();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleSuccess = async (credentialResponse: any) => {
+    if (!isMounted) return;
+    
     if (credentialResponse?.credential) {
       try {
         const res = await sendGoogleLogin({ code: credentialResponse.credential });

@@ -1,3 +1,5 @@
+"use client";
+
 import Login from "@/pages/auth/Login/Login";
 import React from "react";
 
