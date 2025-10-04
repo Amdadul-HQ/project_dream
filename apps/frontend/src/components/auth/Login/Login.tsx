@@ -36,34 +36,31 @@ export default function Login() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData); // send JSON to API
     setIsSubmitting(true);
+    
     try {
       const res = await loginUser(formData);
+      
       if (res?.success) {
         toast.success("Login successful!");
         setUser(res?.data?.user);
         setIsLoading(false);
+        
+        // Route based on user role
         if (res?.data?.user?.role === "USER" || res?.data?.user?.role === "WRITER") {
-          router.push(`/profile/overview`);
-        }
-        if (res?.data?.user?.role === "ADMIN") {
-          router.push(`/admin/posts`);
+          router.push("/profile/overview");
+        } else if (res?.data?.user?.role === "ADMIN") {
+          router.push("/admin/posts");
         }
       } else {
-        toast.error(res?.message || "Login failed. Please try again later.");
+        toast.error(res?.message || "Login failed. Please try again.");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Something went wrong. Please try again in a moment.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleGoogleLogin = () => {
-    console.log("Google login clicked");
-    // Google OAuth logic
   };
 
   return (
@@ -72,7 +69,10 @@ export default function Login() {
         <div className="flex items-center justify-center">
           <Logo />
         </div>
-        <h2 className="text-2xl font-bold text-center mb-6 mt-3 text-slate-900">Login to your account.</h2>
+        <h2 className="text-2xl font-bold text-center mb-6 mt-3 text-slate-900">
+          Login to your account.
+        </h2>
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
           <div>
@@ -114,14 +114,15 @@ export default function Login() {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer flex item-center justify-center"
+            disabled={isSubmitting}
+            className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer flex items-center justify-center disabled:opacity-50"
           >
             {isSubmitting ? <FaSpinner className="animate-spin" /> : "Sign In"}
           </button>
 
           {/* Redirect to Register */}
           <p className="text-sm text-center mt-2 font-medium">
-            Don’t have an account?{" "}
+            Don't have an account?{" "}
             <Link href="/register" className="text-[#2F2685] hover:underline">
               Register
             </Link>
@@ -135,15 +136,8 @@ export default function Login() {
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
 
-        {/* Google Login */}
-        {/* <button
-          onClick={handleGoogleLogin}
-          className="mt-4 w-full flex items-center justify-center gap-2 border py-2 rounded-md hover:bg-gray-100 transition cursor-pointer"
-        >
-          <FcGoogle size={22} />
-          <span>Login with Google</span>
-        </button> */}
-        {/* <GoogleLogin /> */}
+        {/* Google Login Component */}
+        <GoogleLogin />
       </div>
     </div>
   );

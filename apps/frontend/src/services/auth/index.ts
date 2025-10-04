@@ -3,7 +3,9 @@
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
 
-//Regiter user
+/**
+ * Register user with email/password
+ */
 export const registerUser = async (userData: FormData) => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/registration`, {
@@ -13,10 +15,14 @@ export const registerUser = async (userData: FormData) => {
     const result = await res.json();
     return result;
   } catch (error: any) {
-    return Error(error);
+    console.error("Registration error:", error);
+    return { success: false, message: error.message || "Registration failed" };
   }
 };
 
+/**
+ * Login user with email/password
+ */
 export const loginUser = async (userData: FieldValues) => {
   const cookieStore = await cookies();
 
@@ -33,18 +39,32 @@ export const loginUser = async (userData: FieldValues) => {
 
     if (result?.success) {
       // Save token in cookies
-      cookieStore.set("accessToken", result?.data?.token);
+      cookieStore.set("accessToken", result?.data?.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+      });
 
       // Save user in cookies
-      cookieStore.set("user", JSON.stringify(result?.data?.user));
+      cookieStore.set("user", JSON.stringify(result?.data?.user), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7,
+      });
     }
 
     return result;
   } catch (error: any) {
-    return Error(error);
+    console.error("Login error:", error);
+    return { success: false, message: error.message || "Login failed" };
   }
 };
 
+/**
+ * Get current logged-in user
+ */
 export const getCurrentUser = async () => {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
@@ -52,7 +72,6 @@ export const getCurrentUser = async () => {
 
   if (accessToken && userCookie) {
     try {
-      // Return user info from cookies
       return JSON.parse(userCookie);
     } catch (err) {
       console.error("Error parsing user cookie:", err);
@@ -60,20 +79,12 @@ export const getCurrentUser = async () => {
     }
   }
 
-  // Fallback → decode JWT if user cookie not found
-  // if (accessToken) {
-  //   try {
-  //     const decodedData: any = jwtDecode(accessToken);
-  //     return decodedData;
-  //   } catch (err) {
-  //     console.error("Error decoding token:", err);
-  //     return null;
-  //   }
-  // }
-
   return null;
 };
 
+/**
+ * Logout user
+ */
 export const logout = async () => {
   const cookieStore = await cookies();
 
@@ -82,28 +93,77 @@ export const logout = async () => {
   cookieStore.delete("user");
 };
 
-//Resend Verification mail
-export const sendGoogleLogin = async (data: Record<string, any>) => {
+/**
+ * Store Google auth token and user after successful login
+ */
+export const storeGoogleAuthData = async (token: string, user: any) => {
   const cookieStore = await cookies();
+
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/google/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+    // Save token in cookies
+    cookieStore.set("accessToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     });
+
+    // Save user in cookies
+    cookieStore.set("user", JSON.stringify(user), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Store auth data error:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+/**
+ * Send Google JWT credential to backend
+ */
+export const sendGoogleLogin = async (data: { code: string }) => {
+  const cookieStore = await cookies();
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/auth/google/credential`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ credential: data.code }),
+      }
+    );
+
     const result = await res.json();
 
     if (result?.success) {
       // Save token in cookies
-      cookieStore.set("accessToken", result?.data?.token);
+      cookieStore.set("accessToken", result?.data?.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+      });
 
       // Save user in cookies
-      cookieStore.set("user", JSON.stringify(result?.data?.user));
+      cookieStore.set("user", JSON.stringify(result?.data?.user), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7,
+      });
     }
+
     return result;
   } catch (error: any) {
-    return { error: error.message };
+    console.error("Google login error:", error);
+    return { success: false, message: error.message || "Google login failed" };
   }
 };

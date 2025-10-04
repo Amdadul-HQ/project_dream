@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { CloudCog, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import Link from "next/link";
 import Logo from "@/components/shared/Logo/Logo";
 import Image from "next/image";
@@ -19,8 +19,9 @@ import { registerUser } from "@/services/auth";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import GoogleLogin from "@/components/auth/GoogleLogin/GoogleLogin";
 
-// ✅ Zod schema for validation
+// Zod schema for validation
 const registerSchema = z.object({
   name: z.string().nonempty("Name is required"),
   email: z.string().nonempty("Email is required").email("Invalid email address"),
@@ -30,7 +31,10 @@ const registerSchema = z.object({
     .refine((val) => !val || /^[0-9]{11}$/.test(val), {
       message: "Phone must be exactly 11 digits",
     }),
-  password: z.string().nonempty("Password is required").min(6, "Password must be at least 6 characters"),
+  password: z
+    .string()
+    .nonempty("Password is required")
+    .min(6, "Password must be at least 6 characters"),
   profile: z
     .any()
     .optional()
@@ -45,7 +49,6 @@ const registerSchema = z.object({
     }),
 });
 
-// ✅ TypeScript type from schema
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
@@ -53,14 +56,12 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  // ✅ React Hook Form setup with Zod
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     formState: { errors, isSubmitting },
-
     reset,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -78,30 +79,34 @@ export default function RegisterPage() {
     }
   }, [profileImage]);
 
-  // ✅ Form submission
+  // Form submission
   const onSubmit = async (data: RegisterFormData) => {
     const form = new FormData();
     form.append("name", data.name);
     form.append("email", data.email);
     form.append("phone", data.phone || "");
     form.append("password", data.password);
-    form.append("profile", data.profile);
-
-    console.log("FormData entries:");
-    try {
-      const res = await registerUser(form);
-      console.log("res========>,", res);
-      if (res?.success) {
-        toast.success(res?.message);
-        router.push("/login");
-      }
-    } catch (error) {
-      console.log(error);
-      toast.success("Failed to register user. Try again later !!");
+    
+    if (data.profile) {
+      form.append("profile", data.profile);
     }
 
-    reset();
-    setImagePreview(null);
+    try {
+      const res = await registerUser(form);
+      
+      if (res?.success) {
+        toast.success(res?.message || "Registration successful!");
+        router.push("/login");
+      } else {
+        toast.error(res?.message || "Registration failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error("Failed to register. Please try again later.");
+    } finally {
+      reset();
+      setImagePreview(null);
+    }
   };
 
   return (
@@ -111,9 +116,10 @@ export default function RegisterPage() {
           <div className="flex items-center justify-center">
             <Logo />
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-center mt-3 text-slate-900">Create your account.</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mt-3 text-slate-900">
+            Create your account.
+          </h2>
           <div className="flex items-center justify-center mt-5">
-            {/* {imagePreview && ( */}
             <Image
               src={imagePreview || avatar.src}
               alt="Preview"
@@ -121,9 +127,9 @@ export default function RegisterPage() {
               height={50}
               className="w-20 h-20 object-cover rounded-full border shrink-0 p-1"
             />
-            {/* )} */}
           </div>
         </div>
+        
         <CardContent className="mt-0">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" encType="multipart/form-data">
             {/* Name */}
@@ -215,13 +221,16 @@ export default function RegisterPage() {
                   }}
                 />
               </div>
-              {errors.profile?.message && <p className="text-red-500 text-sm">{String(errors.profile.message)}</p>}
+              {errors.profile?.message && (
+                <p className="text-red-500 text-sm">{String(errors.profile.message)}</p>
+              )}
             </div>
 
             {/* Submit */}
             <Button
               type="submit"
-              className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer flex items-center justify-center"
+              disabled={isSubmitting}
+              className="w-full bg-[#2F2685] text-white py-2 px-4 rounded-md hover:bg-[#302685e4] transition cursor-pointer flex items-center justify-center disabled:opacity-50"
             >
               {isSubmitting ? <FaSpinner className="animate-spin" /> : "Register"}
             </Button>
@@ -242,16 +251,8 @@ export default function RegisterPage() {
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
 
-          {/* Google Login */}
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full flex items-center justify-center gap-2 cursor-pointer"
-            onClick={() => console.log("Google Login Clicked")}
-          >
-            <FcGoogle size={20} />
-            Continue with Google
-          </Button>
+          {/* Google Login Component */}
+          <GoogleLogin isRegistration={true} />
         </CardContent>
       </Card>
     </div>
