@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { Upload } from "lucide-react";
 import Link from "next/link";
@@ -252,7 +251,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Google Login Component */}
-          <GoogleLogin isRegistration={true} />
+          <GoogleLogin />
         </CardContent>
       </Card>
     </div>
