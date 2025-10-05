@@ -32,7 +32,7 @@ export interface NotificationResponse {
 
 class NotificationService {
   private socket: Socket | null = null;
-  private eventHandlers: Map<string, Set<Function>> = new Map();
+  private eventHandlers: Map<string, Set<any>> = new Map();
   private isConnecting: boolean = false;
 
   connect(userId: string, token: string) {
@@ -91,14 +91,14 @@ class NotificationService {
     }
   }
 
-  on(event: string, handler: Function) {
+  on(event: string, handler: any) {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, new Set());
     }
     this.eventHandlers.get(event)?.add(handler);
   }
 
-  off(event: string, handler: Function) {
+  off(event: string, handler: any) {
     this.eventHandlers.get(event)?.delete(handler);
   }
 
