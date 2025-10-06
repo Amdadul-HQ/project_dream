@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Upload, X, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useRichTextEditor from "@/components/text-editor/useRichTextEditor";
 import RichtextEdiror from "@/components/text-editor";
@@ -19,10 +20,11 @@ import Footer from "@/components/shared/Footer";
 import Link from "next/link";
 import { TCategories } from "@/types/categories.types";
 import { FaSpinner } from "react-icons/fa";
-import { createBlogPost } from "@/services/post";
+import { createBlogPost, createSeries, getUserSeries } from "@/services/post";
 import { toast } from "sonner";
+import { TSeries } from "@/types/post.types";
 
-// ✅ Updated Schema matching backend requirements
+// ✅ Post Form Schema
 const formSchema = z
   .object({
     title: z.string().min(1, "Title is required"),
@@ -31,7 +33,7 @@ const formSchema = z
     seriesName: z.string().optional(),
     seriesSelect: z.string().optional(),
     seriesOrder: z.string().optional(),
-     status: z.enum(["DRAFT", "PUBLISHED", "SCHEDULED"], {
+    status: z.enum(["DRAFT", "PUBLISHED", "SCHEDULED"], {
       message: "Status is required",
     }).default("DRAFT"),
     scheduledAt: z.string().optional(),
@@ -70,13 +72,29 @@ const formSchema = z
     }
   );
 
-type FormValues = z.infer<typeof formSchema>;
+// ✅ Create Series Schema
+const createSeriesSchema = z.object({
+  name: z.string().min(1, "Series name is required"),
+  slug: z.string().min(1, "Slug is required"),
+  description: z.string().optional(),
+});
 
-const PostBlog = ({ categoriesData }: { categoriesData: TCategories[] }) => {
+type FormValues = z.infer<typeof formSchema>;
+type CreateSeriesValues = z.infer<typeof createSeriesSchema>;
+
+interface PostBlogProps {
+  categoriesData: TCategories[];
+  initialSeriesData?: TSeries[];
+}
+
+const PostBlog = ({ categoriesData, initialSeriesData = [] }: PostBlogProps) => {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [audioPreview, setAudioPreview] = useState<string | null>(null);
+  const [seriesData, setSeriesData] = useState<TSeries[]>(initialSeriesData);
+  const [isSeriesDialogOpen, setIsSeriesDialogOpen] = useState(false);
+  const [isCreatingSeries, setIsCreatingSeries] = useState(false);
   const editor = useRichTextEditor("");
 
   const form = useForm<FormValues>({
@@ -100,12 +118,35 @@ const PostBlog = ({ categoriesData }: { categoriesData: TCategories[] }) => {
     },
   });
 
+  const seriesForm = useForm<CreateSeriesValues>({
+    resolver: zodResolver(createSeriesSchema),
+    defaultValues: {
+      name: "",
+      slug: "",
+      description: "",
+    },
+  });
+
   const {
     formState: { isSubmitting },
     watch,
   } = form;
 
   const selectedStatus = watch("status");
+
+  // ✅ Fetch series data on mount
+  useEffect(() => {
+    const fetchSeries = async () => {
+      const result = await getUserSeries();
+      if (result?.success && result?.data) {
+        setSeriesData(result.data);
+      }
+    };
+    
+    if (initialSeriesData.length === 0) {
+      fetchSeries();
+    }
+  }, [initialSeriesData]);
 
   // ✅ Sync editor content
   useEffect(() => {
@@ -120,6 +161,23 @@ const PostBlog = ({ categoriesData }: { categoriesData: TCategories[] }) => {
       };
     }
   }, [editor, form]);
+
+  // ✅ Auto-generate slug from series name
+  useEffect(() => {
+    const subscription = seriesForm.watch((value, { name }) => {
+      if (name === "name" && value.name) {
+        const slug = value.name
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-+|-+$/g, "");
+        seriesForm.setValue("slug", slug);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [seriesForm]);
 
   const addTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
@@ -166,27 +224,48 @@ const PostBlog = ({ categoriesData }: { categoriesData: TCategories[] }) => {
     setAudioPreview(null);
   };
 
-  // ✅ Submit Handler matching backend expectations
+  // ✅ Create Series Handler
+  // const onCreateSeries = async (data: CreateSeriesValues) => {
+  //   setIsCreatingSeries(true);
+  //   try {
+  //     const result = await createSeries(data);
+      
+  //     if (result?.success) {
+  //       toast.success(result?.message || "Series created successfully!");
+        
+  //       // Refresh series list
+  //       const updatedSeries = await getUserSeries();
+  //       if (updatedSeries?.success && updatedSeries?.data) {
+  //         setSeriesData(updatedSeries.data);
+  //       }
+        
+  //       // Close dialog and reset form
+  //       setIsSeriesDialogOpen(false);
+  //       seriesForm.reset();
+  //     } else {
+  //       toast.error(result?.message || "Failed to create series");
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Failed to create series. Try again later!");
+  //   } finally {
+  //     setIsCreatingSeries(false);
+  //   }
+  // };
+
+  // ✅ Submit Post Handler
   const onSubmit = async (data: FormValues) => {
     const formData = new FormData();
     
-    // Required fields
     formData.append("title", data.title);
     formData.append("content", data.content);
     formData.append("excerpt", data.excerpt);
     formData.append("status", data.status);
-    
-    // Category as JSON array string
     formData.append("categoryIds", JSON.stringify([data.category]));
-    
-    // Tags as JSON array string
     formData.append("tags", JSON.stringify(data.tags));
-    
-    // Files
     formData.append("thumbnail", data.image[0]);
     formData.append("audio", data.audio[0]);
     
-    // Series logic - only one will be sent
     if (data.seriesName?.trim()) {
       formData.append("seriesname", data.seriesName.trim());
       if (data.seriesOrder) {
@@ -199,7 +278,6 @@ const PostBlog = ({ categoriesData }: { categoriesData: TCategories[] }) => {
       }
     }
     
-    // Optional meta fields
     if (data.metaTitle?.trim()) {
       formData.append("metaTitle", data.metaTitle);
     }
@@ -207,25 +285,22 @@ const PostBlog = ({ categoriesData }: { categoriesData: TCategories[] }) => {
       formData.append("metaDescription", data.metaDescription);
     }
     
-    // Scheduled date if status is SCHEDULED
     if (data.status === "SCHEDULED" && data.scheduledAt) {
       formData.append("scheduledAt", data.scheduledAt);
     }
 
-    console.log("FormData submitted:");
-    for (const pair of formData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
-
     try {
       const res = await createBlogPost(formData);
-      console.log("res========>,", res);
+      
       if (res?.success) {
         toast.success(res?.message || "Post created successfully!");
         form.reset();
         setTags([]);
         setImagePreview(null);
         setAudioPreview(null);
+        if (editor) {
+          editor.commands.setContent("");
+        }
       } else {
         toast.error(res?.message || "Failed to create post");
       }
@@ -363,7 +438,7 @@ const PostBlog = ({ categoriesData }: { categoriesData: TCategories[] }) => {
                 )}
               </div>
 
-              {/* Series Name + Select Series + Series Order */}
+              {/* Series Section with Create New Button */}
               <div className="flex flex-col md:flex-row gap-5">
                 <FormField
                   control={form.control}
@@ -387,7 +462,88 @@ const PostBlog = ({ categoriesData }: { categoriesData: TCategories[] }) => {
                   name="seriesSelect"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Or Select Existing Series</FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Or Select Existing Series</FormLabel>
+                        {/* <Dialog open={isSeriesDialogOpen} onOpenChange={setIsSeriesDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-7 gap-1"
+                            >
+                              <Plus size={14} />
+                              <span className="text-xs">New Series</span>
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Create New Series</DialogTitle>
+                            </DialogHeader>
+                            <Form {...seriesForm}>
+                              <form
+                                onSubmit={seriesForm.handleSubmit(onCreateSeries)}
+                                className="space-y-4 mt-4"
+                              >
+                                <FormField
+                                  control={seriesForm.control}
+                                  name="name"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Series Name *</FormLabel>
+                                      <FormControl>
+                                        <Input placeholder="Enter series name" {...field} />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={seriesForm.control}
+                                  name="slug"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Slug *</FormLabel>
+                                      <FormControl>
+                                        <Input placeholder="auto-generated-slug" {...field} />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={seriesForm.control}
+                                  name="description"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Description</FormLabel>
+                                      <FormControl>
+                                        <Textarea
+                                          placeholder="Series description (optional)"
+                                          rows={3}
+                                          {...field}
+                                        />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <Button
+                                  type="submit"
+                                  className="w-full"
+                                  disabled={isCreatingSeries}
+                                >
+                                  {isCreatingSeries ? (
+                                    <FaSpinner className="animate-spin" />
+                                  ) : (
+                                    "Create Series"
+                                  )}
+                                </Button>
+                              </form>
+                            </Form>
+                          </DialogContent>
+                        </Dialog> */}
+                      </div>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
@@ -399,9 +555,17 @@ const PostBlog = ({ categoriesData }: { categoriesData: TCategories[] }) => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="series1">Series 1</SelectItem>
-                          <SelectItem value="series2">Series 2</SelectItem>
-                          <SelectItem value="series3">Series 3</SelectItem>
+                          {seriesData.length === 0 ? (
+                            <div className="p-2 text-sm text-gray-500">
+                              No series available. Create one!
+                            </div>
+                          ) : (
+                            seriesData.map((series) => (
+                              <SelectItem key={series.id} value={series.id}>
+                                {series.name} ({series.postsCount} posts)
+                              </SelectItem>
+                            ))
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
