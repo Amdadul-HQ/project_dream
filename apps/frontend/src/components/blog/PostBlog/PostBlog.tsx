@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Upload, X, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useRichTextEditor from "@/components/text-editor/useRichTextEditor";
@@ -20,7 +19,7 @@ import Footer from "@/components/shared/Footer";
 import Link from "next/link";
 import { TCategories } from "@/types/categories.types";
 import { FaSpinner } from "react-icons/fa";
-import { createBlogPost, createSeries, getUserSeries } from "@/services/post";
+import { createBlogPost, getUserSeries } from "@/services/post";
 import { toast } from "sonner";
 import { TSeries } from "@/types/post.types";
 
@@ -93,8 +92,6 @@ const PostBlog = ({ categoriesData, initialSeriesData = [] }: PostBlogProps) => 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [audioPreview, setAudioPreview] = useState<string | null>(null);
   const [seriesData, setSeriesData] = useState<TSeries[]>(initialSeriesData);
-  const [isSeriesDialogOpen, setIsSeriesDialogOpen] = useState(false);
-  const [isCreatingSeries, setIsCreatingSeries] = useState(false);
   const editor = useRichTextEditor("");
 
   const form = useForm<FormValues>({
@@ -146,7 +143,8 @@ const PostBlog = ({ categoriesData, initialSeriesData = [] }: PostBlogProps) => 
     if (initialSeriesData.length === 0) {
       fetchSeries();
     }
-  }, [initialSeriesData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   // ✅ Sync editor content
   useEffect(() => {
@@ -256,6 +254,7 @@ const PostBlog = ({ categoriesData, initialSeriesData = [] }: PostBlogProps) => 
   // ✅ Submit Post Handler
   const onSubmit = async (data: FormValues) => {
     const formData = new FormData();
+    console.log(data)
     
     formData.append("title", data.title);
     formData.append("content", data.content);
@@ -292,6 +291,7 @@ const PostBlog = ({ categoriesData, initialSeriesData = [] }: PostBlogProps) => 
     try {
       const res = await createBlogPost(formData);
       
+      
       if (res?.success) {
         toast.success(res?.message || "Post created successfully!");
         form.reset();
@@ -316,7 +316,7 @@ const PostBlog = ({ categoriesData, initialSeriesData = [] }: PostBlogProps) => 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="my-5 p-4 sm:p-6 bg-white dark:bg-neutral-900 rounded-lg shadow-lg">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form className="space-y-4">
               {/* Header */}
               <div className="flex items-center justify-between gap-5 flex-wrap mb-4">
                 <h2 className="text-2xl font-bold">Create Post</h2>
@@ -327,7 +327,8 @@ const PostBlog = ({ categoriesData, initialSeriesData = [] }: PostBlogProps) => 
                     </Button>
                   </Link>
                   <Button
-                    type="submit"
+                    type="button"
+                    onClick={form.handleSubmit(onSubmit)}
                     className="flex items-center justify-center"
                     disabled={!form.formState.isValid || isSubmitting}
                   >
